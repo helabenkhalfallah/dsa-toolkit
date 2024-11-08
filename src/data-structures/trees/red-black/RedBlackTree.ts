@@ -1,8 +1,17 @@
 import { Color, RedBlackTreeNode } from './RedBlackTreeNode.ts';
 
+/**
+ * Class representing a Red-Black Tree data structure.
+ * @template T - The type of values stored in the tree.
+ */
 export class RedBlackTree<T> {
+    /** The root node of the Red-Black Tree */
     private root: RedBlackTreeNode<T> | null = null;
 
+    /**
+     * Left rotation operation for balancing the tree.
+     * @param {RedBlackTreeNode<T>} x - The node to rotate.
+     */
     private rotateLeft(x: RedBlackTreeNode<T>): void {
         const y = x.right!;
         x.right = y.left;
@@ -19,6 +28,10 @@ export class RedBlackTree<T> {
         x.parent = y;
     }
 
+    /**
+     * Right rotation operation for balancing the tree.
+     * @param {RedBlackTreeNode<T>} x - The node to rotate.
+     */
     private rotateRight(x: RedBlackTreeNode<T>): void {
         const y = x.left!;
         x.left = y.right;
@@ -35,19 +48,48 @@ export class RedBlackTree<T> {
         x.parent = y;
     }
 
+    /**
+     * Inserts a value into the Red-Black Tree.
+     * @param {T} value - The value to insert.
+     */
     insert(value: T): void {
         const newNode = new RedBlackTreeNode(value);
         this.root = this._insert(this.root, newNode);
         this.fixInsert(newNode);
     }
 
+    /**
+     * Searches for a value in the Red-Black Tree.
+     * @param {T} value - The value to search for.
+     * @returns {boolean} - Returns true if the value is found, otherwise false.
+     */
+    search(value: T): boolean {
+        return this._search(this.root, value);
+    }
+
+    /**
+     * Deletes a value from the Red-Black Tree.
+     * @param {T} value - The value to delete.
+     */
+    delete(value: T): void {
+        const nodeToDelete = this.findNode(value);
+        if (!nodeToDelete) return;
+        this.deleteNode(nodeToDelete);
+    }
+
+    // Helper functions
+
+    /**
+     * Helper function to insert a node into the tree recursively.
+     * @param {RedBlackTreeNode<T> | null} node - The current node in the tree.
+     * @param {RedBlackTreeNode<T>} newNode - The new node to insert.
+     * @returns {RedBlackTreeNode<T> | null} - The root node after insertion.
+     */
     private _insert(
         node: RedBlackTreeNode<T> | null,
         newNode: RedBlackTreeNode<T>,
     ): RedBlackTreeNode<T> | null {
-        if (node === null) {
-            return newNode;
-        }
+        if (node === null) return newNode;
 
         if (newNode.value < node.value) {
             node.left = this._insert(node.left, newNode);
@@ -55,13 +97,14 @@ export class RedBlackTree<T> {
         } else if (newNode.value > node.value) {
             node.right = this._insert(node.right, newNode);
             if (node.right) node.right.parent = node;
-        } else {
-            return node; // Duplicate values are not allowed
         }
-
         return node;
     }
 
+    /**
+     * Fixes the Red-Black Tree properties after insertion.
+     * @param {RedBlackTreeNode<T>} node - The node to start the fix from.
+     */
     private fixInsert(node: RedBlackTreeNode<T>): void {
         while (node.parent && node.parent.color === Color.RED) {
             let parent = node.parent;
@@ -70,25 +113,21 @@ export class RedBlackTree<T> {
             if (parent === grandparent.left) {
                 const uncle = grandparent.right;
                 if (uncle && uncle.color === Color.RED) {
-                    // Case 1: Uncle is red
                     parent.color = Color.BLACK;
                     uncle.color = Color.BLACK;
                     grandparent.color = Color.RED;
                     node = grandparent;
                 } else {
-                    // Case 2: Uncle is black, node is right child
                     if (node === parent.right) {
                         node = parent;
                         this.rotateLeft(node);
                         parent = node.parent!;
                     }
-                    // Case 3: Uncle is black, node is left child
                     parent.color = Color.BLACK;
                     grandparent.color = Color.RED;
                     this.rotateRight(grandparent);
                 }
             } else {
-                // Symmetric cases for when parent is right child
                 const uncle = grandparent.left;
                 if (uncle && uncle.color === Color.RED) {
                     parent.color = Color.BLACK;
@@ -107,33 +146,41 @@ export class RedBlackTree<T> {
                 }
             }
         }
-        this.root!.color = Color.BLACK;
+        if (this.root) this.root.color = Color.BLACK;
     }
 
-    search(value: T): boolean {
-        return this._search(this.root, value);
-    }
-
+    /**
+     * Recursive function to search for a value in the tree.
+     * @param {RedBlackTreeNode<T> | null} node - The current node.
+     * @param {T} value - The value to search for.
+     * @returns {boolean} - Whether the value is found.
+     */
     private _search(node: RedBlackTreeNode<T> | null, value: T): boolean {
-        if (node === null) {
-            return false;
-        }
-        if (value === node.value) {
-            return true;
-        }
-        if (value < node.value) {
-            return this._search(node.left, value);
-        } else {
-            return this._search(node.right, value);
-        }
+        if (node === null) return false;
+        if (value === node.value) return true;
+        return value < node.value
+            ? this._search(node.left, value)
+            : this._search(node.right, value);
     }
 
-    delete(value: T): void {
-        const nodeToDelete = this.findNode(value);
-        if (!nodeToDelete) return;
-        this.deleteNode(nodeToDelete);
+    /**
+     * Finds a node with the specified value.
+     * @param {T} value - The value to search for.
+     * @returns {RedBlackTreeNode<T> | null} - The found node, or null if not found.
+     */
+    private findNode(value: T): RedBlackTreeNode<T> | null {
+        let node = this.root;
+        while (node) {
+            if (value === node.value) return node;
+            node = value < node.value ? node.left : node.right;
+        }
+        return null;
     }
 
+    /**
+     * Deletes a specified node from the tree and fixes tree properties.
+     * @param {RedBlackTreeNode<T>} node - The node to delete.
+     */
     private deleteNode(node: RedBlackTreeNode<T>): void {
         let replacement = node;
         let originalColor = replacement.color;
@@ -169,6 +216,11 @@ export class RedBlackTree<T> {
         }
     }
 
+    /**
+     * Transplants one subtree in place of another.
+     * @param {RedBlackTreeNode<T> | null} u - The node to be replaced.
+     * @param {RedBlackTreeNode<T> | null} v - The replacement node.
+     */
     private transplant(u: RedBlackTreeNode<T> | null, v: RedBlackTreeNode<T> | null): void {
         if (!u?.parent) {
             this.root = v;
@@ -180,6 +232,11 @@ export class RedBlackTree<T> {
         if (v) v.parent = u?.parent;
     }
 
+    /**
+     * Finds the minimum node starting from a given node.
+     * @param {RedBlackTreeNode<T>} node - The node to start from.
+     * @returns {RedBlackTreeNode<T>} - The minimum node.
+     */
     private minimum(node: RedBlackTreeNode<T>): RedBlackTreeNode<T> {
         while (node.left) {
             node = node.left;
@@ -187,15 +244,10 @@ export class RedBlackTree<T> {
         return node;
     }
 
-    private findNode(value: T): RedBlackTreeNode<T> | null {
-        let node = this.root;
-        while (node) {
-            if (value === node.value) return node;
-            node = value < node.value ? node.left : node.right;
-        }
-        return null;
-    }
-
+    /**
+     * Fixes the Red-Black Tree properties after deletion.
+     * @param {RedBlackTreeNode<T> | null} x - The node to fix from.
+     */
     private fixDelete(x: RedBlackTreeNode<T> | null): void {
         while (x !== this.root && (!x || x.color === Color.BLACK)) {
             if (x && x.parent && x === x.parent.left) {

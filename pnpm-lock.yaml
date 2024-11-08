@@ -39,7 +39,7 @@ importers:
         specifier: '=5.2.1'
         version: 5.2.1(@types/eslint@9.6.1)(eslint-config-prettier@9.1.0(eslint@9.0.0))(eslint@9.0.0)(prettier@3.3.3)
       husky:
-        specifier: ^9.1.6
+        specifier: '=9.1.6'
         version: 9.1.6
       nodemon:
         specifier: '=2.0.19'
