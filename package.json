@@ -1,6 +1,6 @@
 {
   "name": "dsa-toolkit",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
   "type": "module",
   "main": "dist/index.js",
@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build:tsc": "rimraf ./dist && tsc",
-    "start:dev": "nodemon --exec node --loader ts-node/esm src/index.ts -- --dev",
+    "start:dev": "nodemon --exec node --loader ts-node/esm ./benchmarks.ts -- --dev",
     "lint": "eslint --config ./eslint.config.mjs --cache-location ./.eslintcache \"./**/*.ts\" --cache",
     "lint:fix": "eslint --config ./eslint.config.mjs --cache-location ./.eslintcache \"./**/*.ts\" --cache --fix",
     "format": "prettier --write ./src",
