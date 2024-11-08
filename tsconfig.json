@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES2021",
-    "lib": ["ES2022"],
+    "target": "ES2023",
+    "lib": ["ES2023"],
     "importHelpers": true,
-    "module": "commonjs",
+    "module": "NodeNext",
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -11,6 +11,7 @@
     "types": ["node"],
     "declaration": true,
     "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
     "baseUrl": ".",
     "rootDir": ".",
     "allowJs": true,
