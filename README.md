@@ -47,7 +47,12 @@ pnpm install
 
 ## 🛠️ Usage
 
-The DSA Toolkit provides various data structures and algorithms accessible through the main index file.
+To install the DSA Toolkit:
+```bash
+pnpm add dsa-toolbox 
+```
+
+Then you can import the Data Structure or the Algorithm you want to use:
 
 ```typescript
 import {
@@ -80,7 +85,7 @@ import {
   BinarySearchTree,
   RedBlackTree,
   Trie,
-} from 'dsa-toolkit';
+} from 'dsa-toolbox';
 
 // Example: Using binary search
 const index = binarySearch([1, 2, 3, 4, 5], 3, (a, b) => a - b);
