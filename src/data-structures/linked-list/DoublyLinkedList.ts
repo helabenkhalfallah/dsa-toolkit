@@ -12,7 +12,6 @@ export class DoublyLinkedList<T> {
     private head: DoublyLinkedListNode<T> | null = null;
     private tail: DoublyLinkedListNode<T> | null = null;
 
-    // Insert a new value at the end of the doubly linked list
     insert(value: T): void {
         const newNode = new DoublyLinkedListNode(value);
         if (!this.head) {
@@ -25,43 +24,32 @@ export class DoublyLinkedList<T> {
         }
     }
 
-    // Insert at a specific position
-    insertAt(value: T, index: number): void {
-        const newNode = new DoublyLinkedListNode(value);
+    // Get value at specific index
+    getAt(index: number): T | null {
+        let current: DoublyLinkedListNode<T> | null;
+        let currentIndex: number;
 
-        if (index <= 0 || !this.head) {
-            // Insert at the beginning
-            newNode.next = this.head;
-            if (this.head) this.head.prev = newNode;
-            this.head = newNode;
-            if (!this.tail) this.tail = newNode;
-            return;
-        }
-
-        let current = this.head;
-        let currentIndex = 0;
-
-        while (current && currentIndex < index - 1) {
-            current = current.next;
-            currentIndex++;
-        }
-
-        if (current) {
-            // Insert in the middle or end
-            newNode.next = current.next;
-            newNode.prev = current;
-            if (current.next) current.next.prev = newNode;
-            current.next = newNode;
-            if (!newNode.next) this.tail = newNode;
+        // Choose traversal direction based on index
+        if (index <= this.size() / 2) {
+            current = this.head;
+            currentIndex = 0;
+            while (current) {
+                if (currentIndex === index) return current.value;
+                current = current.next;
+                currentIndex++;
+            }
         } else {
-            // If the index is out of bounds, append to the end
-            this.tail!.next = newNode;
-            newNode.prev = this.tail;
-            this.tail = newNode;
+            current = this.tail;
+            currentIndex = this.size() - 1;
+            while (current) {
+                if (currentIndex === index) return current.value;
+                current = current.prev;
+                currentIndex--;
+            }
         }
+        return null; // If index is out of bounds
     }
 
-    // Search for a value in the doubly linked list
     search(value: T): boolean {
         let current = this.head;
         while (current) {
@@ -71,16 +59,8 @@ export class DoublyLinkedList<T> {
         return false;
     }
 
-    // Delete a value from the doubly linked list
     delete(value: T): void {
         if (!this.head) return;
-
-        if (this.head.value === value) {
-            this.head = this.head.next;
-            if (this.head) this.head.prev = null;
-            if (this.head === null) this.tail = null;
-            return;
-        }
 
         let current = this.head;
         while (current && current.value !== value) {
@@ -88,9 +68,26 @@ export class DoublyLinkedList<T> {
         }
 
         if (current) {
-            if (current.next) current.next.prev = current.prev;
-            if (current.prev) current.prev.next = current.next;
-            if (current === this.tail) this.tail = current.prev;
+            if (current === this.head) {
+                this.head = this.head.next;
+                if (this.head) this.head.prev = null;
+                if (!this.head) this.tail = null;
+            } else {
+                if (current.next) current.next.prev = current.prev;
+                if (current.prev) current.prev!.next = current.next;
+                if (current === this.tail) this.tail = current.prev;
+            }
         }
+    }
+
+    // Helper to get the current size of the list
+    size(): number {
+        let count = 0;
+        let current = this.head;
+        while (current) {
+            count++;
+            current = current.next;
+        }
+        return count;
     }
 }

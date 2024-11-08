@@ -5,10 +5,9 @@ export class BTree<T> {
     private readonly t: number;
 
     constructor(t: number) {
-        this.t = t;
+        this.t = t; // Minimum degree (defines the range for the number of keys)
     }
 
-    // Utility function to search a key in this tree
     search(key: T, node: BTreeNode<T> | null = this.root): BTreeNode<T> | null {
         if (!node) return null;
 
@@ -28,7 +27,6 @@ export class BTree<T> {
         }
     }
 
-    // Insert a new key into this B-tree
     insert(key: T): void {
         if (!this.root) {
             this.root = new BTreeNode<T>(true);
@@ -48,10 +46,8 @@ export class BTree<T> {
         let i = node.keys.length - 1;
 
         if (node.leaf) {
-            while (i >= 0 && key < node.keys[i]) {
-                i--;
-            }
-            node.keys.splice(i + 1, 0, key);
+            node.keys.push(key); // Add the key to the leaf node
+            node.keys.sort((a, b) => (a < b ? -1 : 1)); // Sort the keys
         } else {
             while (i >= 0 && key < node.keys[i]) {
                 i--;
@@ -60,7 +56,6 @@ export class BTree<T> {
 
             if (node.children[i].keys.length === 2 * this.t - 1) {
                 this.splitChild(node, i, node.children[i]);
-
                 if (key > node.keys[i]) {
                     i++;
                 }
@@ -73,19 +68,23 @@ export class BTree<T> {
         const newNode = new BTreeNode<T>(child.leaf);
         const t = this.t;
 
+        // Move the right half of keys from child to newNode
         newNode.keys = child.keys.splice(t, t - 1);
+
         if (!child.leaf) {
+            // Move the corresponding children to newNode
             newNode.children = child.children.splice(t);
         }
 
-        parent.children.splice(i + 1, 0, newNode);
-        parent.keys.splice(i, 0, child.keys.pop()!);
+        parent.children.splice(i + 1, 0, newNode); // Insert newNode to parent's children
+        parent.keys.splice(i, 0, child.keys.pop()!); // Move middle key from child to parent
     }
 
-    // Deletes a key from this B-tree
     delete(key: T): void {
         if (!this.root) return;
         this.deleteFromNode(this.root, key);
+
+        // If the root becomes empty after deletion
         if (this.root.keys.length === 0) {
             if (!this.root.leaf) {
                 this.root = this.root.children[0];
@@ -95,42 +94,63 @@ export class BTree<T> {
         }
     }
 
-    private deleteFromNode(node: BTreeNode<T> | null, key: T): void {
-        if (!node) return; // Check if node is null
+    private deleteFromNode(node: BTreeNode<T>, key: T): void {
+        if (!node) return; // Key not found
 
-        const idx = node.keys.findIndex((k) => k === key);
+        const i = node.keys.findIndex((k) => k === key);
 
-        // Case 1: The key is found in this node
-        if (idx !== -1) {
+        if (i !== -1) {
+            // Key is present in the node
             if (node.leaf) {
-                // Case 1a: The node is a leaf node
-                node.keys.splice(idx, 1);
+                // Case 1: If the node is a leaf, simply remove the key
+                node.keys.splice(i, 1);
             } else {
-                // Case 1b: The node is an internal node
-                if (node.children[idx].keys.length >= this.t) {
-                    // Predecessor
-                    node.keys[idx] = this.getPredecessor(node, idx);
-                    this.deleteFromNode(node.children[idx], node.keys[idx]);
-                } else if (node.children[idx + 1].keys.length >= this.t) {
-                    // Successor
-                    node.keys[idx] = this.getSuccessor(node, idx);
-                    this.deleteFromNode(node.children[idx + 1], node.keys[idx]);
+                // Case 2: If the node is an internal node
+                if (node.children[i].keys.length >= this.t) {
+                    // Case 2a: If the child that precedes key in the node has at least t keys,
+                    // find the predecessor 'pred' of key in the subtree rooted at that child.
+                    // Replace key by pred. Recursively delete pred in the child.
+                    const pred = this.getPredecessor(node, i);
+                    node.keys[i] = pred;
+                    this.deleteFromNode(node.children[i], pred);
+                } else if (node.children[i + 1].keys.length >= this.t) {
+                    // Case 2b: If the child that succeeds key in the node has at least t keys,
+                    // find the successor 'succ' of key in the subtree rooted at that child.
+                    // Replace key by succ. Recursively delete succ in the child.
+                    const succ = this.getSuccessor(node, i);
+                    node.keys[i] = succ;
+                    this.deleteFromNode(node.children[i + 1], succ);
                 } else {
-                    // Merge
-                    this.merge(node, idx);
-                    this.deleteFromNode(node.children[idx], key);
+                    // Case 2c: If both the child that precedes key and the child that succeeds it
+                    // have less that t keys, merge key and all of the child that succeeds key into
+                    // the child that precedes key so that the child now contains 2t-1 keys.
+                    // Free the child that succeeds key, which is now empty.
+                    // Recursively delete key from the child which now contains 2t-1 keys.
+                    this.merge(node, i);
+                    this.deleteFromNode(node.children[i], key);
                 }
             }
-        } else if (!node.leaf) {
-            // Case 2: The key is not found in this node and node is not a leaf
-            let i = node.keys.findIndex((k) => key < k);
-            if (i === -1) i = node.keys.length; // If key is greater than all keys
-
-            const child = node.children[i];
-            if (child.keys.length < this.t) {
-                this.fill(node, i);
+        } else {
+            // Key is not present in the node, descend to appropriate child
+            if (node.leaf) {
+                return; // Key not found
             }
-            this.deleteFromNode(node.children[i], key);
+
+            let childIndex = node.keys.length;
+            for (let j = 0; j < node.keys.length; j++) {
+                if (key < node.keys[j]) {
+                    childIndex = j;
+                    break;
+                }
+            }
+
+            // If the child has less than t keys, fill it up
+            if (node.children[childIndex].keys.length < this.t) {
+                this.fill(node, childIndex);
+            }
+
+            // Recursively delete from the appropriate child
+            this.deleteFromNode(node.children[childIndex], key);
         }
     }
 
@@ -151,7 +171,6 @@ export class BTree<T> {
     }
 
     private fill(node: BTreeNode<T>, i: number): void {
-        // const child = node.children[i];
         if (i > 0 && node.children[i - 1].keys.length >= this.t) {
             this.borrowFromPrev(node, i);
         } else if (i < node.keys.length && node.children[i + 1].keys.length >= this.t) {
@@ -170,8 +189,11 @@ export class BTree<T> {
         const sibling = node.children[i - 1];
 
         child.keys.unshift(node.keys[i - 1]);
-        if (!child.leaf) child.children.unshift(sibling.children.pop()!);
         node.keys[i - 1] = sibling.keys.pop()!;
+
+        if (!child.leaf) {
+            child.children.unshift(sibling.children.pop()!);
+        }
     }
 
     private borrowFromNext(node: BTreeNode<T>, i: number): void {
@@ -179,19 +201,25 @@ export class BTree<T> {
         const sibling = node.children[i + 1];
 
         child.keys.push(node.keys[i]);
-        if (!child.leaf) child.children.push(sibling.children.shift()!);
         node.keys[i] = sibling.keys.shift()!;
+
+        if (!child.leaf) {
+            child.children.push(sibling.children.shift()!);
+        }
     }
 
     private merge(node: BTreeNode<T>, i: number): void {
         const child = node.children[i];
         const sibling = node.children[i + 1];
 
-        child.keys.push(node.keys[i]);
-        child.keys.push(...sibling.keys);
-        if (!child.leaf) child.children.push(...sibling.children);
+        child.keys.push(node.keys[i]); // Move the key from the parent to the child
+        child.keys = child.keys.concat(sibling.keys); // Merge sibling's keys into child
 
-        node.keys.splice(i, 1);
-        node.children.splice(i + 1, 1);
+        if (!child.leaf) {
+            child.children = child.children.concat(sibling.children); // Merge sibling's children
+        }
+
+        node.keys.splice(i, 1); // Remove the key from the parent
+        node.children.splice(i + 1, 1); // Remove the sibling
     }
 }

@@ -15,20 +15,20 @@ export class BinarySearchTree<T> {
             node.left = this._insert(node.left, value);
         } else if (value > node.value) {
             node.right = this._insert(node.right, value);
-        }
+        } // No need for else, duplicates are ignored
         return node;
     }
 
     search(value: T): boolean {
-        return this._search(this.root, value) !== null;
+        return this._search(this.root, value);
     }
 
-    private _search(
-        node: BinarySearchTreeNode<T> | null,
-        value: T,
-    ): BinarySearchTreeNode<T> | null {
-        if (node === null || node.value === value) {
-            return node;
+    private _search(node: BinarySearchTreeNode<T> | null, value: T): boolean {
+        if (node === null) {
+            return false;
+        }
+        if (value === node.value) {
+            return true;
         }
         if (value < node.value) {
             return this._search(node.left, value);
@@ -52,21 +52,18 @@ export class BinarySearchTree<T> {
         } else if (value > node.value) {
             node.right = this._delete(node.right, value);
         } else {
+            // Node with one or no child
             if (node.left === null) return node.right;
             if (node.right === null) return node.left;
 
-            const minValue = this._minValue(node.right);
-            node.value = minValue;
-            node.right = this._delete(node.right, minValue);
+            // Node with two children
+            let successor = node.right;
+            while (successor.left !== null) {
+                successor = successor.left;
+            }
+            node.value = successor.value;
+            node.right = this._delete(node.right, successor.value);
         }
         return node;
-    }
-
-    private _minValue(node: BinarySearchTreeNode<T>): T {
-        let current = node;
-        while (current.left !== null) {
-            current = current.left;
-        }
-        return current.value;
     }
 }

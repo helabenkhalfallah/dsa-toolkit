@@ -3,7 +3,6 @@ import { Color, RedBlackTreeNode } from './RedBlackTreeNode.ts';
 export class RedBlackTree<T> {
     private root: RedBlackTreeNode<T> | null = null;
 
-    // Helper function to rotate left at node x
     private rotateLeft(x: RedBlackTreeNode<T>): void {
         const y = x.right!;
         x.right = y.left;
@@ -20,7 +19,6 @@ export class RedBlackTree<T> {
         x.parent = y;
     }
 
-    // Helper function to rotate right at node x
     private rotateRight(x: RedBlackTreeNode<T>): void {
         const y = x.left!;
         x.left = y.right;
@@ -37,98 +35,99 @@ export class RedBlackTree<T> {
         x.parent = y;
     }
 
-    // Insert a value into the Red-Black Tree
     insert(value: T): void {
         const newNode = new RedBlackTreeNode(value);
-        if (!this.root) {
-            this.root = newNode;
-            this.root.color = Color.BLACK;
-            return;
-        }
-
-        let node = this.root;
-        let parent: RedBlackTreeNode<T> | null = null;
-        while (node) {
-            parent = node;
-            if (value < node.value) {
-                node = node.left;
-            } else {
-                node = node.right;
-            }
-        }
-
-        newNode.parent = parent;
-        if (value < parent!.value) {
-            parent!.left = newNode;
-        } else {
-            parent!.right = newNode;
-        }
-
+        this.root = this._insert(this.root, newNode);
         this.fixInsert(newNode);
     }
 
-    // Balances the tree after insertion
+    private _insert(
+        node: RedBlackTreeNode<T> | null,
+        newNode: RedBlackTreeNode<T>,
+    ): RedBlackTreeNode<T> | null {
+        if (node === null) {
+            return newNode;
+        }
+
+        if (newNode.value < node.value) {
+            node.left = this._insert(node.left, newNode);
+            if (node.left) node.left.parent = node;
+        } else if (newNode.value > node.value) {
+            node.right = this._insert(node.right, newNode);
+            if (node.right) node.right.parent = node;
+        } else {
+            return node; // Duplicate values are not allowed
+        }
+
+        return node;
+    }
+
     private fixInsert(node: RedBlackTreeNode<T>): void {
         while (node.parent && node.parent.color === Color.RED) {
-            const parent = node.parent;
+            let parent = node.parent;
             const grandparent = parent.parent!;
 
-            if (grandparent) {
-                if (parent === grandparent.left) {
-                    const uncle = grandparent.right;
-                    if (uncle && uncle.color === Color.RED) {
-                        parent.color = Color.BLACK;
-                        uncle.color = Color.BLACK;
-                        grandparent.color = Color.RED;
-                        node = grandparent;
-                    } else {
-                        if (node === parent.right) {
-                            node = parent;
-                            this.rotateLeft(node);
-                        }
-                        parent.color = Color.BLACK;
-                        grandparent.color = Color.RED;
-                        this.rotateRight(grandparent);
-                    }
+            if (parent === grandparent.left) {
+                const uncle = grandparent.right;
+                if (uncle && uncle.color === Color.RED) {
+                    // Case 1: Uncle is red
+                    parent.color = Color.BLACK;
+                    uncle.color = Color.BLACK;
+                    grandparent.color = Color.RED;
+                    node = grandparent;
                 } else {
-                    const uncle = grandparent.left;
-                    if (uncle && uncle.color === Color.RED) {
-                        parent.color = Color.BLACK;
-                        uncle.color = Color.BLACK;
-                        grandparent.color = Color.RED;
-                        node = grandparent;
-                    } else {
-                        if (node === parent.left) {
-                            node = parent;
-                            this.rotateRight(node);
-                        }
-                        parent.color = Color.BLACK;
-                        grandparent.color = Color.RED;
-                        this.rotateLeft(grandparent);
+                    // Case 2: Uncle is black, node is right child
+                    if (node === parent.right) {
+                        node = parent;
+                        this.rotateLeft(node);
+                        parent = node.parent!;
                     }
+                    // Case 3: Uncle is black, node is left child
+                    parent.color = Color.BLACK;
+                    grandparent.color = Color.RED;
+                    this.rotateRight(grandparent);
                 }
             } else {
-                break;
+                // Symmetric cases for when parent is right child
+                const uncle = grandparent.left;
+                if (uncle && uncle.color === Color.RED) {
+                    parent.color = Color.BLACK;
+                    uncle.color = Color.BLACK;
+                    grandparent.color = Color.RED;
+                    node = grandparent;
+                } else {
+                    if (node === parent.left) {
+                        node = parent;
+                        this.rotateRight(node);
+                        parent = node.parent!;
+                    }
+                    parent.color = Color.BLACK;
+                    grandparent.color = Color.RED;
+                    this.rotateLeft(grandparent);
+                }
             }
         }
         this.root!.color = Color.BLACK;
     }
 
-    // Search for a value in the Red-Black Tree
     search(value: T): boolean {
-        return this.findNode(value) !== null;
+        return this._search(this.root, value);
     }
 
-    private findNode(value: T): RedBlackTreeNode<T> | null {
-        let node = this.root;
-        while (node) {
-            if (value === node.value) return node;
-            node = value < node.value ? node.left : node.right;
+    private _search(node: RedBlackTreeNode<T> | null, value: T): boolean {
+        if (node === null) {
+            return false;
         }
-        return null;
+        if (value === node.value) {
+            return true;
+        }
+        if (value < node.value) {
+            return this._search(node.left, value);
+        } else {
+            return this._search(node.right, value);
+        }
     }
 
-    // Delete a value from the Red-Black Tree
     delete(value: T): void {
         const nodeToDelete = this.findNode(value);
         if (!nodeToDelete) return;
@@ -138,7 +137,7 @@ export class RedBlackTree<T> {
     private deleteNode(node: RedBlackTreeNode<T>): void {
         let replacement = node;
         let originalColor = replacement.color;
-        let x: RedBlackTreeNode<T> | null;
+        let x: RedBlackTreeNode<T> | null = null;
 
         if (!node.left) {
             x = node.right;
@@ -178,7 +177,7 @@ export class RedBlackTree<T> {
         } else {
             u.parent.right = v;
         }
-        if (v) v.parent = u?.parent || null;
+        if (v) v.parent = u?.parent;
     }
 
     private minimum(node: RedBlackTreeNode<T>): RedBlackTreeNode<T> {
@@ -188,53 +187,65 @@ export class RedBlackTree<T> {
         return node;
     }
 
+    private findNode(value: T): RedBlackTreeNode<T> | null {
+        let node = this.root;
+        while (node) {
+            if (value === node.value) return node;
+            node = value < node.value ? node.left : node.right;
+        }
+        return null;
+    }
+
     private fixDelete(x: RedBlackTreeNode<T> | null): void {
         while (x !== this.root && (!x || x.color === Color.BLACK)) {
             if (x && x.parent && x === x.parent.left) {
                 let sibling = x.parent.right;
-                if (sibling?.color === Color.RED) {
+                if (sibling && sibling.color === Color.RED) {
                     sibling.color = Color.BLACK;
                     x.parent.color = Color.RED;
                     this.rotateLeft(x.parent);
                     sibling = x.parent.right;
                 }
                 if (
-                    (!sibling?.left || sibling.left.color === Color.BLACK) &&
-                    (!sibling?.right || sibling.right.color === Color.BLACK)
+                    sibling &&
+                    (!sibling.left || sibling.left.color === Color.BLACK) &&
+                    (!sibling.right || sibling.right.color === Color.BLACK)
                 ) {
-                    if (sibling) sibling.color = Color.RED;
+                    sibling.color = Color.RED;
                     x = x.parent;
-                } else {
-                    if (!sibling?.right || sibling.right.color === Color.BLACK) {
-                        if (sibling?.left) sibling.left.color = Color.BLACK;
-                        if (sibling) sibling.color = Color.RED;
+                } else if (sibling) {
+                    if (!sibling.right || sibling.right.color === Color.BLACK) {
+                        if (sibling.left) sibling.left.color = Color.BLACK;
+                        sibling.color = Color.RED;
                         this.rotateRight(sibling);
                         sibling = x.parent.right;
                     }
-                    if (sibling) sibling.color = x.parent.color;
+                    sibling.color = x.parent.color;
                     x.parent.color = Color.BLACK;
-                    if (sibling?.right) sibling.right.color = Color.BLACK;
+                    if (sibling.right) sibling.right.color = Color.BLACK;
                     this.rotateLeft(x.parent);
                     x = this.root;
                 }
             } else if (x && x.parent) {
+                // Symmetric case for x being a right child
                 let sibling = x.parent.left;
-                if (sibling?.color === Color.RED) {
+                if (sibling && sibling.color === Color.RED) {
                     sibling.color = Color.BLACK;
                     x.parent.color = Color.RED;
                     this.rotateRight(x.parent);
                     sibling = x.parent.left;
                 }
                 if (
-                    (!sibling?.right || sibling.right.color === Color.BLACK) &&
-                    (!sibling?.left || sibling.left.color === Color.BLACK)
+                    sibling &&
+                    (!sibling.right || sibling.right.color === Color.BLACK) &&
+                    (!sibling.left || sibling.left.color === Color.BLACK)
                 ) {
-                    if (sibling) sibling.color = Color.RED;
+                    sibling.color = Color.RED;
                     x = x.parent;
-                } else {
-                    if (!sibling?.left || sibling.left.color === Color.BLACK) {
-                        if (sibling?.right) sibling.right.color = Color.BLACK;
-                        if (sibling) sibling.color = Color.RED;
+                } else if (sibling) {
+                    if (!sibling.left || sibling.left.color === Color.BLACK) {
+                        if (sibling.right) sibling.right.color = Color.BLACK;
+                        sibling.color = Color.RED;
                         this.rotateLeft(sibling);
                         sibling = x.parent.left;
                     }
@@ -245,8 +256,11 @@ export class RedBlackTree<T> {
                     x = this.root;
                 }
             } else {
-                break; // Safeguard in case `x` or `x.parent` is `null`
+                break; // Exit the loop if x becomes null or x.parent becomes null
             }
+
+            // Move x up the tree
+            x = x?.parent;
         }
         if (x) x.color = Color.BLACK;
     }

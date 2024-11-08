@@ -11,7 +11,6 @@ export class LinkedList<T> {
     private head: LinkedListNode<T> | null = null;
     private tail: LinkedListNode<T> | null = null;
 
-    // Insert a new value at the end of the linked list in O(1) time
     insert(value: T): void {
         const newNode = new LinkedListNode(value);
         if (!this.head) {
@@ -23,39 +22,21 @@ export class LinkedList<T> {
         }
     }
 
-    // Insert at a specific position
-    insertAt(value: T, index: number): void {
-        const newNode = new LinkedListNode(value);
-
-        if (index <= 0 || !this.head) {
-            // Insert at the beginning
-            newNode.next = this.head;
-            this.head = newNode;
-            if (!this.tail) this.tail = newNode;
-            return;
-        }
-
+    // Get value at specific index
+    getAt(index: number): T | null {
         let current = this.head;
         let currentIndex = 0;
 
-        while (current && currentIndex < index - 1) {
+        while (current) {
+            if (currentIndex === index) {
+                return current.value;
+            }
             current = current.next;
             currentIndex++;
         }
-
-        if (current) {
-            // Insert in the middle or end
-            newNode.next = current.next;
-            current.next = newNode;
-            if (!newNode.next) this.tail = newNode;
-        } else {
-            // If the index is out of bounds, append to the end
-            this.tail!.next = newNode;
-            this.tail = newNode;
-        }
+        return null; // If index is out of bounds
     }
 
-    // Search for a value in the linked list
     search(value: T): boolean {
         let current = this.head;
         while (current) {
@@ -65,7 +46,6 @@ export class LinkedList<T> {
         return false;
     }
 
-    // Delete a value from the linked list
     delete(value: T): void {
         if (!this.head) return;
 
@@ -81,8 +61,8 @@ export class LinkedList<T> {
         }
 
         if (current.next) {
-            if (current.next === this.tail) this.tail = current;
             current.next = current.next.next;
+            if (!current.next) this.tail = current;
         }
     }
 }
