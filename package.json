@@ -1,5 +1,5 @@
 {
-  "name": "dsa-toolkit",
+  "name": "@dsa/toolkit",
   "version": "0.0.1",
   "description": "",
   "type": "module",
