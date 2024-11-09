@@ -10,13 +10,14 @@
     "skipLibCheck": true,
     "types": ["node"],
     "declaration": true,
+    "declarationMap": true,
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "emitDeclarationOnly": true,
     "baseUrl": ".",
-    "rootDir": ".",
     "allowJs": true,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "rootDir": "./src"
   },
   "include": ["src/**/*.ts"],
   "exclude": [
