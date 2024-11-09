@@ -54,7 +54,7 @@ importers:
         specifier: '=0.26.11'
         version: 0.26.11(typescript@5.6.2)
       typedoc-github-theme:
-        specifier: ^0.1.2
+        specifier: '=0.1.2'
         version: 0.1.2(typedoc@0.26.11(typescript@5.6.2))
       typescript:
         specifier: '=5.6.2'
