@@ -1,5 +1,5 @@
 
-# DSA Toolkit 📚
+# DSA Toolbox 📚
 
 A powerful toolkit for data structures and algorithms in TypeScript, designed for optimal performance and versatility. The toolkit provides implementations of various data structures and algorithms, with a focus on search and sort operations, caching, and probabilistic data structures.
 
@@ -21,14 +21,14 @@ Make sure you have [pnpm](https://pnpm.io/) installed as it’s used for package
 
 ### Installation
 
-To install the DSA Toolkit, clone the repository and install dependencies with pnpm:
+To install the DSA Toolbox, clone the repository and install dependencies with pnpm:
 
 ```bash
 # Clone the repository
-git clone https://github.com/helabenkhalfallah/dsa-toolkit.git
+git clone https://github.com/helabenkhalfallah/dsa-toolbox.git
 
 # Navigate into the project directory
-cd dsa-toolkit
+cd dsa-toolbox
 
 # Install dependencies
 pnpm install
@@ -47,7 +47,7 @@ pnpm install
 
 ## 🛠️ Usage
 
-To install the DSA Toolkit:
+To install the DSA Toolbox:
 ```bash
 pnpm add dsa-toolbox 
 ```
@@ -110,4 +110,4 @@ For detailed explanations of each data structure and algorithm, please visit:
 
 ---
 
-Happy coding with the DSA Toolkit! 🎉
+Happy coding with the DSA Toolbox! 🎉
