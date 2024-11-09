@@ -3,28 +3,16 @@
  * @template T - The type of the value stored in the node.
  */
 export class AVLTreeNode<T> {
-    /**
-     * The value stored in the node.
-     * @type {T}
-     */
+    /** The value stored in the node. */
     value: T;
 
-    /**
-     * The height of the node, used to maintain AVL balance.
-     * @type {number}
-     */
+    /** The height of the node, used to maintain AVL balance. */
     height: number = 1;
 
-    /**
-     * The left child of the node.
-     * @type {AVLTreeNode<T> | null}
-     */
+    /** Pointer to the left child node. */
     left: AVLTreeNode<T> | null = null;
 
-    /**
-     * The right child of the node.
-     * @type {AVLTreeNode<T> | null}
-     */
+    /** Pointer to the right child node. */
     right: AVLTreeNode<T> | null = null;
 
     /**

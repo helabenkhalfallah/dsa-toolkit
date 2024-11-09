@@ -22,8 +22,7 @@ export class BloomFilter {
      * @param {string} item - The item to add.
      */
     add(item: string): void {
-        const hashes = this.getHashIndices(item);
-        for (const index of hashes) {
+        for (const index of this.getHashIndices(item)) {
             this.setBit(index);
         }
     }
@@ -34,13 +33,10 @@ export class BloomFilter {
      * @returns {boolean} True if the item is possibly in the filter, false if definitely not.
      */
     mightContain(item: string): boolean {
-        const hashes = this.getHashIndices(item);
-        for (const index of hashes) {
-            if (!this.getBit(index)) {
-                return false; // If any bit is not set, the item is definitely not in the filter
-            }
+        for (const index of this.getHashIndices(item)) {
+            if (!this.getBit(index)) return false;
         }
-        return true; // If all bits are set, the item might be in the filter
+        return true;
     }
 
     /**
@@ -48,9 +44,7 @@ export class BloomFilter {
      * @param {number} index - The index of the bit to set.
      */
     private setBit(index: number): void {
-        const byteIndex = Math.floor(index / 8);
-        const bitIndex = index % 8;
-        this.bitArray[byteIndex] |= 1 << bitIndex;
+        this.bitArray[index >> 3] |= 1 << (index & 7); // Optimized bitwise division and modulus
     }
 
     /**
@@ -59,9 +53,7 @@ export class BloomFilter {
      * @returns {boolean} True if the bit is set, false otherwise.
      */
     private getBit(index: number): boolean {
-        const byteIndex = Math.floor(index / 8);
-        const bitIndex = index % 8;
-        return (this.bitArray[byteIndex] & (1 << bitIndex)) !== 0;
+        return (this.bitArray[index >> 3] & (1 << (index & 7))) !== 0;
     }
 
     /**
@@ -70,25 +62,21 @@ export class BloomFilter {
      * @returns {number[]} An array of hash indices.
      */
     private getHashIndices(item: string): number[] {
-        const hashes: number[] = [];
-        for (let i = 0; i < this.hashCount; i++) {
-            const hash = this.hash(item + i); // Combine item with index to generate different hashes
-            hashes.push(hash % this.size);
-        }
-        return hashes;
+        return Array.from({ length: this.hashCount }, (_, i) => this.hash(item, i) % this.size);
     }
 
     /**
-     * A simple hash function to hash an item.
+     * A hash function with a seed for creating multiple hashes.
      * @param {string} item - The item to hash.
+     * @param {number} seed - Seed to vary the hash function.
      * @returns {number} The hash value.
      */
-    private hash(item: string): number {
-        let hash = 0;
-        for (let i = 0; i < item.length; i++) {
-            hash = (hash << 5) - hash + item.charCodeAt(i); // Bitwise hash
-            hash |= 0; // Convert to 32-bit integer
+    private hash(item: string, seed: number): number {
+        let hash = seed;
+        for (const char of item) {
+            hash = Math.imul(hash ^ char.charCodeAt(0), 0x5bd1e995);
+            hash ^= hash >>> 13;
         }
-        return hash >>> 0; // Convert to unsigned integer
+        return hash >>> 0; // Convert to unsigned 32-bit integer
     }
 }

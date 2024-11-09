@@ -71,21 +71,20 @@ export class MinHeap<T> {
         while (true) {
             const leftChildIndex = 2 * index + 1;
             const rightChildIndex = 2 * index + 2;
-            let leftChild: T, rightChild: T;
             let swap: number | null = null;
 
             if (leftChildIndex < length) {
-                leftChild = this.heap[leftChildIndex];
+                const leftChild = this.heap[leftChildIndex];
                 if (leftChild < element) {
                     swap = leftChildIndex;
                 }
             }
 
             if (rightChildIndex < length) {
-                rightChild = this.heap[rightChildIndex];
+                const rightChild = this.heap[rightChildIndex];
                 if (
                     (swap === null && rightChild < element) ||
-                    (swap !== null && rightChild < leftChild!)
+                    (swap !== null && rightChild < this.heap[leftChildIndex])
                 ) {
                     swap = rightChildIndex;
                 }
@@ -100,11 +99,29 @@ export class MinHeap<T> {
     }
 
     /**
-     * Gets the value of the root element.
+     * Gets the value of the root element (minimum element).
      *
      * @returns {T | null} - The root value of the heap, or null if the heap is empty.
      */
     get root(): T | null {
-        return this.heap[0] || null;
+        return this.heap.length > 0 ? this.heap[0] : null;
+    }
+
+    /**
+     * Gets the size of the heap.
+     *
+     * @returns {number} - The number of elements in the heap.
+     */
+    get size(): number {
+        return this.heap.length;
+    }
+
+    /**
+     * Checks if the heap is empty.
+     *
+     * @returns {boolean} - True if the heap is empty, false otherwise.
+     */
+    isEmpty(): boolean {
+        return this.heap.length === 0;
     }
 }

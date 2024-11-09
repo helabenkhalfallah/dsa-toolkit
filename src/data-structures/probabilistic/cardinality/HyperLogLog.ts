@@ -38,16 +38,13 @@ export class HyperLogLog {
      * @returns {number} The estimated count of distinct elements.
      */
     estimate(): number {
-        const Z = Math.pow(
-            2,
-            this.registers.reduce((acc, r) => acc + 1 / Math.pow(2, r), 0),
-        );
+        const Z = 1 / this.registers.reduce((acc, r) => acc + 1 / Math.pow(2, r), 0);
         const E = this.alphaMM * Z;
         return this.correctBias(E);
     }
 
     /**
-     * Hashes a string value to a 32-bit integer.
+     * Hashes a string value to a 32-bit integer using FNV-1a hash function.
      * @param {string} value - The value to hash.
      * @returns {number} The hashed value.
      */
@@ -61,7 +58,7 @@ export class HyperLogLog {
             h *= FNV_prime;
         }
 
-        return Number(h & 0xffffffffn); // Use bitwise AND with BigInt
+        return Number(h & 0xffffffffn); // Mask to 32-bit
     }
 
     /**
@@ -83,20 +80,21 @@ export class HyperLogLog {
     }
 
     /**
-     * Calculates the position of the most significant bit (1-based).
+     * Calculates the position of the first set bit (1-based).
      * @param {number} w - The remaining bits.
-     * @returns {number} The position of the most significant bit.
+     * @returns {number} The position of the first set bit.
      */
     private calculateRho(w: number): number {
-        return w === 0 ? 1 : w.toString(2).length - w.toString(2).indexOf('1'); // 1-based position
+        return w === 0 ? 32 - this.b + 1 : Math.clz32(w) + 1;
     }
 
     /**
-     * Computes the alphaMM constant.
+     * Computes the alphaMM constant for bias correction.
      * @returns {number} The computed alphaMM.
      */
     private calculateAlphaMM(): number {
-        return (0.7213 / (1 + 1.079 / this.m)) * this.m * this.m; // Bias correction constant
+        const alpha = 0.7213 / (1 + 1.079 / this.m); // Bias correction constant
+        return alpha * this.m * this.m;
     }
 
     /**
@@ -105,14 +103,20 @@ export class HyperLogLog {
      * @returns {number} The corrected estimate.
      */
     private correctBias(E: number): number {
-        // Use different correction techniques based on E
-        if (E <= 2.5 * this.m) {
-            const V = this.registers.filter((r) => r === 0).length;
-            return this.m * Math.log(this.m / V); // Small range correction
-        } else if (E > 1 / 30) {
-            return -Math.pow(2, 32) * Math.log(1 - E / Math.pow(2, 32)); // Large range correction
-        } else {
-            return E; // No correction needed
+        const V = this.registers.filter((r) => r === 0).length;
+
+        // Small range correction when estimate is less than or equal to 2.5m
+        if (E <= 2.5 * this.m && V > 0) {
+            return this.m * Math.log(this.m / V);
         }
+
+        // Large range correction when estimate exceeds a threshold
+        const largeRangeThreshold = 1 << 32;
+        if (E > largeRangeThreshold / 30) {
+            return -largeRangeThreshold * Math.log(1 - E / largeRangeThreshold);
+        }
+
+        // No correction for intermediate values
+        return E;
     }
 }

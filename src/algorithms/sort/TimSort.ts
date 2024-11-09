@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 interface TimSortConfig {
     minGallop?: number; // Minimum galloping threshold (default: 7)
     minRunLength?: number; // Minimum run length, calculated based on array length if not provided
@@ -7,17 +6,17 @@ interface TimSortConfig {
 /**
  * Copies a portion of an array to another array.
  *
- * @param {any[]} destArr - The destination array where elements will be copied to.
+ * @param {T[]} destArr - The destination array where elements will be copied to.
  * @param {number} destIndex - The starting index in the destination array.
- * @param {any[]} srcArr - The source array from which elements will be copied.
+ * @param {T[]} srcArr - The source array from which elements will be copied.
  * @param {number} srcIndex - The starting index in the source array.
  * @param {number} length - The number of elements to copy.
  */
 // eslint-disable-next-line max-params
-function copyArray(
-    destArr: any[],
+function copyArray<T>(
+    destArr: T[],
     destIndex: number,
-    srcArr: any[],
+    srcArr: T[],
     srcIndex: number,
     length: number,
 ): void {
@@ -46,12 +45,12 @@ function computeMinRunLength(n: number, defaultMinRun: number = 64): number {
  * Sorts a small portion of the array using binary insertion sort.
  */
 // eslint-disable-next-line max-params
-function binaryInsertionSort(
-    arr: any[],
+function binaryInsertionSort<T>(
+    arr: T[],
     low: number,
     start: number,
     high: number,
-    compareFn: (a: any, b: any) => number,
+    compareFn: (a: T, b: T) => number,
 ): void {
     for (let i = start; i < high; ++i) {
         let left = low;
@@ -78,11 +77,11 @@ function binaryInsertionSort(
  * Identifies and potentially reverses a run within the array.
  */
 // eslint-disable-next-line max-params
-function countAndMakeRun(
-    arr: any[],
+function countAndMakeRun<T>(
+    arr: T[],
     low: number,
     high: number,
-    compareFn: (a: any, b: any) => number,
+    compareFn: (a: T, b: T) => number,
 ): number {
     if (low >= high - 1) return 1;
 
@@ -108,7 +107,7 @@ function countAndMakeRun(
 /**
  * Reverses a portion of the array in-place.
  */
-function reverseRange(arr: any[], from: number, to: number): void {
+function reverseRange<T>(arr: T[], from: number, to: number): void {
     let low = from;
     let high = to - 1;
     while (low < high) {
@@ -124,13 +123,13 @@ function reverseRange(arr: any[], from: number, to: number): void {
  * Performs a galloping search to the left to find the insertion point of a key.
  */
 // eslint-disable-next-line max-params
-function gallopLeft(
-    arr: any[],
-    key: any,
+function gallopLeft<T>(
+    arr: T[],
+    key: T,
     base: number,
     length: number,
     hint: number,
-    compareFn: (a: any, b: any) => number,
+    compareFn: (a: T, b: T) => number,
 ): number {
     let lastOfs = 0;
     let offset = 1;
@@ -177,13 +176,13 @@ function gallopLeft(
  * Performs a galloping search to the right to find the insertion point of a key.
  */
 // eslint-disable-next-line max-params
-function gallopRight(
-    arr: any[],
-    key: any,
+function gallopRight<T>(
+    arr: T[],
+    key: T,
     base: number,
     length: number,
     hint: number,
-    compareFn: (a: any, b: any) => number,
+    compareFn: (a: T, b: T) => number,
 ): number {
     let lastOfs = 0;
     let offset = 1;
@@ -230,15 +229,14 @@ function gallopRight(
  * Merges two runs on the pendingRuns stack to maintain TimSort invariants.
  */
 // eslint-disable-next-line max-params
-function mergeCollapse(
+function mergeCollapse<T>(
     pendingRuns: { base: number; length: number }[],
-    arr: any[],
-    compareFn: (a: any, b: any) => number,
+    arr: T[],
+    compareFn: (a: T, b: T) => number,
     minGallop: number,
 ): void {
     while (pendingRuns.length > 1) {
         let n = pendingRuns.length - 2;
-
         if (
             (n > 0 && pendingRuns[n - 1].length <= pendingRuns[n + 1].length) ||
             pendingRuns[n].length <= pendingRuns[n + 1].length
@@ -259,10 +257,10 @@ function mergeCollapse(
  * Merges all runs on the pendingRuns stack until only one remains.
  */
 // eslint-disable-next-line max-params
-function mergeForceCollapse(
+function mergeForceCollapse<T>(
     pendingRuns: { base: number; length: number }[],
-    arr: any[],
-    compareFn: (a: any, b: any) => number,
+    arr: T[],
+    compareFn: (a: T, b: T) => number,
     minGallop: number,
 ): void {
     while (pendingRuns.length > 1) {
@@ -277,25 +275,25 @@ function mergeForceCollapse(
 /**
  * Merges two runs with lengthA <= lengthB.
  *
- * @param {any[]} arr - The array being sorted.
- * @param {any[]} tempArray - The temporary array for merging.
+ * @param {T[]} arr - The array being sorted.
+ * @param {T[]} tempArray - The temporary array for merging.
  * @param {number} baseA - The starting index of the first run.
  * @param {number} lengthA - The length of the first run.
  * @param {number} baseB - The starting index of the second run.
  * @param {number} lengthB - The length of the second run.
  * @param {number} minGallop - The minimum galloping threshold.
- * @param {function(a: any, b: any): number} compareFn - The comparison function.
+ * @param {function(a: T, b: T): number} compareFn - The comparison function.
  */
 // eslint-disable-next-line max-params,max-statements
-function mergeLow(
-    arr: any[],
-    tempArray: any[],
+function mergeLow<T>(
+    arr: T[],
+    tempArray: T[],
     baseA: number,
     lengthA: number,
     baseB: number,
     lengthB: number,
     minGallop: number,
-    compareFn: (a: any, b: any) => number,
+    compareFn: (a: T, b: T) => number,
 ): void {
     copyArray(tempArray, 0, arr, baseA, lengthA);
     let dest = baseA;
@@ -377,25 +375,25 @@ function mergeLow(
 /**
  * Merges two runs with lengthA >= lengthB.
  *
- * @param {any[]} arr - The array being sorted.
- * @param {any[]} tempArray - The temporary array for merging.
+ * @param {T[]} arr - The array being sorted.
+ * @param {T[]} tempArray - The temporary array for merging.
  * @param {number} baseA - The starting index of the first run.
  * @param {number} lengthA - The length of the first run.
  * @param {number} baseB - The starting index of the second run.
  * @param {number} lengthB - The length of the second run.
  * @param {number} minGallop - The minimum galloping threshold.
- * @param {function(a: any, b: any): number} compareFn - The comparison function.
+ * @param {function(a: T, b: T): number} compareFn - The comparison function.
  */
 // eslint-disable-next-line max-params,max-statements
-function mergeHigh(
-    arr: any[],
-    tempArray: any[],
+function mergeHigh<T>(
+    arr: T[],
+    tempArray: T[],
     baseA: number,
     lengthA: number,
     baseB: number,
     lengthB: number,
     minGallop: number,
-    compareFn: (a: any, b: any) => number,
+    compareFn: (a: T, b: T) => number,
 ): void {
     copyArray(tempArray, 0, arr, baseB, lengthB);
     let dest = baseB + lengthB - 1;
@@ -488,12 +486,12 @@ function mergeHigh(
  * Merges the two runs at the specified index on the pendingRuns stack.
  */
 // eslint-disable-next-line max-params
-function mergeAt(
+function mergeAt<T>(
     pendingRuns: { base: number; length: number }[],
-    arr: any[],
+    arr: T[],
     i: number,
     minGallop: number,
-    compareFn: (a: any, b: any) => number,
+    compareFn: (a: T, b: T) => number,
 ): void {
     const { base: baseA, length: lengthA } = pendingRuns[i];
     const { base: baseB, length: lengthB } = pendingRuns[i + 1];
@@ -539,16 +537,16 @@ function mergeAt(
  * Smaller Values (e.g., 16 to 32): For smaller arrays (a few hundred elements or fewer), smaller values may be better as they allow quicker sorting of small chunks and reduce overhead. Lowering minRunLength can also be effective if you know the data is mostly random with little pre-existing order.
  * Larger Values (e.g., 48 to 64): For very large arrays (thousands of elements or more) or datasets with many short ordered subsequences, larger minRunLength values may reduce the number of initial runs and improve merge efficiency.
  *
- * @param {any[]} arr - The array to be sorted.
- * @param {function(a: any, b: any): number} compareFn - The comparison function.
+ * @param {T[]} arr - The array to be sorted.
+ * @param {function(a: T, b: T): number} compareFn - The comparison function.
  * @param {TimSortConfig} [config] - Optional configuration parameters for TimSort.
- * @returns {any[]} The sorted array.
+ * @returns {T[]} The sorted array.
  */
-export function timSort(
-    arr: any[],
-    compareFn: (a: any, b: any) => number,
+export function timSort<T>(
+    arr: T[],
+    compareFn: (a: T, b: T) => number,
     config: TimSortConfig = {},
-): any[] {
+): T[] {
     if (arr.length < 2) return arr;
 
     const pendingRuns: { base: number; length: number }[] = [];

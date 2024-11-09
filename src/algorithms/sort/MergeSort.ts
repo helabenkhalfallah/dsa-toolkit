@@ -1,14 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Merges two sorted arrays into a single sorted array using a comparison function.
  *
- * @param {any[]} left - The left sorted array.
- * @param {any[]} right - The right sorted array.
- * @param {(a: any, b: any) => number} compareFn - The comparison function.
- * @returns {any[]} The merged sorted array.
+ * @template T - The type of elements in the arrays.
+ * @param {T[]} left - The left sorted array.
+ * @param {T[]} right - The right sorted array.
+ * @param {(a: T, b: T) => number} compareFn - The comparison function.
+ * @returns {T[]} The merged sorted array.
  */
-function merge(left: any[], right: any[], compareFn: (a: any, b: any) => number): any[] {
-    const result: any[] = [];
+function merge<T>(left: T[], right: T[], compareFn: (a: T, b: T) => number): T[] {
+    const result: T[] = [];
     let i = 0;
     let j = 0;
 
@@ -20,17 +20,18 @@ function merge(left: any[], right: any[], compareFn: (a: any, b: any) => number)
         }
     }
 
-    return [...(result || []), ...(left.slice(i) || []), ...(right.slice(j) || [])];
+    return [...result, ...left.slice(i), ...right.slice(j)];
 }
 
 /**
  * Sorts an array using the Merge Sort algorithm with a comparison function.
  *
- * @param {any[]} arr - The array to sort.
- * @param {(a: any, b: any) => number} compareFn - The comparison function.
- * @returns {any[]} The sorted array.
+ * @template T - The type of elements in the array.
+ * @param {T[]} arr - The array to sort.
+ * @param {(a: T, b: T) => number} compareFn - The comparison function.
+ * @returns {T[]} The sorted array.
  */
-export function mergeSort(arr: any[], compareFn: (a: any, b: any) => number): any[] {
+export function mergeSort<T>(arr: T[], compareFn: (a: T, b: T) => number): T[] {
     if (arr.length <= 1) return arr;
 
     const mid = Math.floor(arr.length / 2);

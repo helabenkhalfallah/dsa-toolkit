@@ -33,9 +33,10 @@ class ComparableNode<T> {
 /**
  * Hybrid search that adapts to data length and configuration for optimal performance.
  *
- * @param {any[]} data - The array of data to search.
- * @param {any} target - The target value to find.
- * @param {HybridSearchConfig<any>} config - Configuration for the hybrid search algorithm.
+ * @template T - The type of elements in the array.
+ * @param {T[]} data - The array of data to search.
+ * @param {T} target - The target value to find.
+ * @param {HybridSearchConfig<T>} config - Configuration for the hybrid search algorithm.
  * @returns {number | boolean} - The index of the target in the array or -1 if not found for array searches.
  *                               For Red-Black Tree search, returns true if found, false if not.
  */
@@ -60,7 +61,7 @@ export function hybridSearch<T>(
 
     // Case 2: Use binary search for mid-sized datasets
     if (length >= linearSearchThreshold && length < binarySearchThreshold) {
-        const sortedData = isSorted ? data : timSort(data, compareFn);
+        const sortedData = isSorted ? data : timSort([...data], compareFn); // Avoid mutating the original array
         return binarySearch(sortedData, target, { isSorted: true, compareFn });
     }
 
@@ -69,9 +70,9 @@ export function hybridSearch<T>(
         const tree = new RedBlackTree<ComparableNode<T>>();
         const wrappedTarget = new ComparableNode(target, compareFn);
 
+        // Insert all items into the Red-Black Tree
         for (const item of data) {
-            const wrappedItem = new ComparableNode(item, compareFn);
-            tree.insert(wrappedItem);
+            tree.insert(new ComparableNode(item, compareFn));
         }
 
         // Perform search on Red-Black Tree

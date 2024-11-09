@@ -32,6 +32,9 @@ export class DoublyLinkedList<T> {
     /** The tail node of the list */
     private tail: DoublyLinkedListNode<T> | null = null;
 
+    /** The current size of the list */
+    private _size: number = 0;
+
     /**
      * Inserts a new value at the end of the list.
      * @param {T} value - The value to insert.
@@ -46,6 +49,7 @@ export class DoublyLinkedList<T> {
             newNode.prev = this.tail;
             this.tail = newNode;
         }
+        this._size++;
     }
 
     /**
@@ -55,10 +59,12 @@ export class DoublyLinkedList<T> {
      * @returns {T | null} - The value at the specified index or null if out of bounds.
      */
     getAt(index: number): T | null {
+        if (index < 0 || index >= this._size) return null;
+
         let current: DoublyLinkedListNode<T> | null;
         let currentIndex: number;
 
-        if (index <= this.size() / 2) {
+        if (index <= this._size / 2) {
             current = this.head;
             currentIndex = 0;
             while (current) {
@@ -68,14 +74,14 @@ export class DoublyLinkedList<T> {
             }
         } else {
             current = this.tail;
-            currentIndex = this.size() - 1;
+            currentIndex = this._size - 1;
             while (current) {
                 if (currentIndex === index) return current.value;
                 current = current.prev;
                 currentIndex--;
             }
         }
-        return null; // If index is out of bounds
+        return null;
     }
 
     /**
@@ -112,23 +118,41 @@ export class DoublyLinkedList<T> {
                 if (!this.head) this.tail = null;
             } else {
                 if (current.next) current.next.prev = current.prev;
-                if (current.prev) current.prev!.next = current.next;
+                if (current.prev) current.prev.next = current.next;
                 if (current === this.tail) this.tail = current.prev;
             }
+            this._size--;
         }
     }
 
     /**
-     * Computes the current size of the list.
+     * Gets the current size of the list.
      * @returns {number} - The number of nodes in the list.
      */
     size(): number {
-        let count = 0;
+        return this._size;
+    }
+
+    /**
+     * Converts the list to an array for easy visualization.
+     * @returns {T[]} - An array containing all values in the list.
+     */
+    toArray(): T[] {
+        const result: T[] = [];
         let current = this.head;
         while (current) {
-            count++;
+            result.push(current.value);
             current = current.next;
         }
-        return count;
+        return result;
+    }
+
+    /**
+     * Clears all nodes from the list, resetting it to an empty state.
+     */
+    clear(): void {
+        this.head = null;
+        this.tail = null;
+        this._size = 0;
     }
 }

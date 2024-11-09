@@ -1,14 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Heapifies a subtree rooted with node i which is an index in arr[].
  *
- * @param {any[]} arr - The array to heapify.
+ * @template T - The type of elements in the array.
+ * @param {T[]} arr - The array to heapify.
  * @param {number} n - The size of the heap.
  * @param {number} i - The index of the root element.
- * @param {(a: any, b: any) => number} compareFn - A comparison function that defines the sort order.
+ * @param {(a: T, b: T) => number} compareFn - A comparison function that defines the sort order.
  */
 // eslint-disable-next-line max-params
-function heapify(arr: any[], n: number, i: number, compareFn: (a: any, b: any) => number): void {
+function heapify<T>(arr: T[], n: number, i: number, compareFn: (a: T, b: T) => number): void {
     let largest = i; // Initialize largest as root
     const left = 2 * i + 1; // left = 2*i + 1
     const right = 2 * i + 2; // right = 2*i + 2
@@ -35,11 +35,12 @@ function heapify(arr: any[], n: number, i: number, compareFn: (a: any, b: any) =
 /**
  * Performs HeapSort on an array.
  *
- * @param {any[]} arr - The array to sort.
- * @param {(a: any, b: any) => number} compareFn - A comparison function that defines the sort order.
- * @returns {any[]} The sorted array.
+ * @template T - The type of elements in the array.
+ * @param {T[]} arr - The array to sort.
+ * @param {(a: T, b: T) => number} compareFn - A comparison function that defines the sort order.
+ * @returns {T[]} The sorted array.
  */
-export function heapSort(arr: any[], compareFn: (a: any, b: any) => number): any[] {
+export function heapSort<T>(arr: T[], compareFn: (a: T, b: T) => number): T[] {
     const n = arr.length;
 
     // Build heap (rearrange the array)

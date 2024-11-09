@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { timSort } from '../sort/TimSort.ts';
 
 /**
  * Configuration options for the ternary search algorithm.
  */
-interface TernarySearchConfig {
-    compareFn: (a: any, b: any) => number; // Custom comparison function
+interface TernarySearchConfig<T> {
+    compareFn: (a: T, b: T) => number; // Custom comparison function
     isSorted?: boolean; // Whether the array is already sorted (default: false)
 }
 
@@ -13,28 +12,26 @@ interface TernarySearchConfig {
  * Performs a ternary search on an array with a custom comparison function.
  * If the array is not sorted and `isSorted` is false, TimSort will be applied.
  *
- * @param {any[]} data - The array to search.
- * @param {any} target - The value to search for.
- * @param {TernarySearchConfig} config - Configuration object containing compareFn and isSorted.
+ * @template T - The type of elements in the array.
+ * @param {T[]} data - The array to search.
+ * @param {T} target - The value to search for.
+ * @param {TernarySearchConfig<T>} config - Configuration object containing compareFn and isSorted.
  * @param {number} [left=0] - The left index of the current search range.
  * @param {number} [right=data.length - 1] - The right index of the current search range.
  * @returns {number} The index of the target in the array, or -1 if not found.
  */
 // eslint-disable-next-line max-params
-export function ternarySearch(
-    data: any[],
-    target: any,
+export function ternarySearch<T>(
+    data: T[],
+    target: T,
     left: number = 0,
     right: number = data.length - 1,
-    config: TernarySearchConfig,
+    config: TernarySearchConfig<T>,
 ): number {
     const { compareFn, isSorted = false } = config;
 
     // Sort the array if it is not sorted
-    let sortedData = data;
-    if (!isSorted) {
-        sortedData = timSort(data, compareFn);
-    }
+    const sortedData = isSorted ? data : timSort([...data], compareFn); // Avoid mutating the original array
 
     // Search for the target
     if (right >= left) {

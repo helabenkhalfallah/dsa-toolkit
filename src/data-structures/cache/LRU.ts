@@ -16,7 +16,8 @@ class LRUNode<T> {
 }
 
 /**
- * Class representing an LRU Cache.
+ * Class representing an LRU (Least Recently Used) Cache.
+ * The cache evicts the least recently used items when the capacity is reached.
  */
 export class LRUCache<T> {
     private capacity: number;
@@ -39,27 +40,28 @@ export class LRUCache<T> {
 
     /**
      * Retrieves the value associated with the specified key.
+     * If the key exists, it is moved to the head (most recently used).
      * @param {number} key - The key to look up.
      * @returns {T | null} The value associated with the key, or null if not found.
      */
     get(key: number): T | null {
-        if (!this.cache.has(key)) {
-            return null;
-        }
+        const node = this.cache.get(key);
+        if (!node) return null;
 
-        const node = this.cache.get(key)!;
         this.moveToHead(node);
         return node.value;
     }
 
     /**
      * Inserts or updates the value associated with the specified key.
+     * If the key already exists, it updates the value and moves it to the head.
+     * If the key is new, it adds the key-value pair and evicts the LRU item if over capacity.
      * @param {number} key - The key to insert or update.
      * @param {T} value - The value to associate with the key.
      */
     put(key: number, value: T): void {
-        if (this.cache.has(key)) {
-            const node = this.cache.get(key)!;
+        const node = this.cache.get(key);
+        if (node) {
             node.value = value;
             this.moveToHead(node);
         } else {
@@ -74,7 +76,7 @@ export class LRUCache<T> {
     }
 
     /**
-     * Moves a node to the head of the linked list.
+     * Moves an existing node to the head of the linked list, marking it as most recently used.
      * @param {LRUNode<T>} node - The node to move.
      * @private
      */
@@ -84,14 +86,14 @@ export class LRUCache<T> {
     }
 
     /**
-     * Adds a node right after the head.
+     * Adds a node right after the head, marking it as most recently used.
      * @param {LRUNode<T>} node - The node to add.
      * @private
      */
     private addNode(node: LRUNode<T>): void {
         node.prev = this.head;
         node.next = this.head.next;
-        this.head.next.prev = node;
+        this.head.next!.prev = node;
         this.head.next = node;
     }
 
@@ -104,12 +106,13 @@ export class LRUCache<T> {
         const prevNode = node.prev;
         const nextNode = node.next;
 
-        prevNode!.next = nextNode;
-        nextNode!.prev = prevNode;
+        if (prevNode) prevNode.next = nextNode;
+        if (nextNode) nextNode.prev = prevNode;
     }
 
     /**
      * Removes the least recently used node from the cache.
+     * This node is found right before the tail node.
      * @private
      */
     private removeLRU(): void {

@@ -36,12 +36,10 @@ export class CountMinSketch {
      * @returns {number} The estimated count for the key.
      */
     estimate(key: string): number {
-        let minCount = Infinity;
-        for (let i = 0; i < this.depth; i++) {
-            const index = this.hashFunctions[i](key) % this.width;
-            minCount = Math.min(minCount, this.sketch[i][index]);
-        }
-        return minCount;
+        return this.hashFunctions.reduce((minCount, hashFn, i) => {
+            const index = hashFn(key) % this.width;
+            return Math.min(minCount, this.sketch[i][index]);
+        }, Infinity);
     }
 
     /**
@@ -50,23 +48,21 @@ export class CountMinSketch {
      * @returns {((key: string) => number)[]} An array of hash functions.
      */
     private createHashFunctions(depth: number): ((key: string) => number)[] {
-        return Array.from({ length: depth }, (_, seed) => {
-            return (key: string) => this.simpleHash(key, seed);
-        });
+        return Array.from({ length: depth }, (_, seed) => (key) => this.simpleHash(key, seed));
     }
 
     /**
-     * A simple hash function that uses a seed for variance.
+     * A simple hash function with seed variance for hash diversity.
      * @param {string} key - The key to hash.
      * @param {number} seed - The seed for the hash function.
      * @returns {number} The hash value.
      */
     private simpleHash(key: string, seed: number): number {
-        let hash = 0;
-        for (let i = 0; i < key.length; i++) {
-            hash = (hash << 5) - hash + key.charCodeAt(i) + seed; // Hash function with seed
-            hash |= 0; // Convert to 32-bit integer
+        let hash = seed;
+        for (const char of key) {
+            hash = Math.imul(hash ^ char.charCodeAt(0), 0x5bd1e995); // Mixes bits for more spread
+            hash ^= hash >>> 13;
         }
-        return hash;
+        return hash >>> 0; // Convert to an unsigned 32-bit integer
     }
 }

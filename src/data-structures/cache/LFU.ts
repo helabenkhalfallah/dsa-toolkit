@@ -88,11 +88,9 @@ export class LFUCache<K, V> {
         this.removeNodeFromFrequency(node, oldFrequency);
         this.addNodeToFrequency(node, node.frequency);
 
-        if (!this.frequencyToNodes.get(oldFrequency)!.size) {
-            if (this.minFrequency === oldFrequency) {
-                this.minFrequency++;
-            }
-            this.frequencyToNodes.delete(oldFrequency);
+        // Update minFrequency if necessary
+        if (oldFrequency === this.minFrequency && !this.frequencyToNodes.get(oldFrequency)?.size) {
+            this.minFrequency++;
         }
     }
 
@@ -118,7 +116,13 @@ export class LFUCache<K, V> {
      * @private
      */
     private removeNodeFromFrequency(node: LFUNode<K, V>, frequency: number): void {
-        this.frequencyToNodes.get(frequency)!.delete(node);
+        const nodes = this.frequencyToNodes.get(frequency);
+        if (nodes) {
+            nodes.delete(node);
+            if (nodes.size === 0) {
+                this.frequencyToNodes.delete(frequency);
+            }
+        }
     }
 
     /**
@@ -127,13 +131,15 @@ export class LFUCache<K, V> {
      * @private
      */
     private evict(): void {
-        const nodesWithMinFreq = this.frequencyToNodes.get(this.minFrequency)!;
-        const nodeToEvict = nodesWithMinFreq.values().next().value; // Get the first node
+        const nodesWithMinFreq = this.frequencyToNodes.get(this.minFrequency);
+        if (!nodesWithMinFreq || nodesWithMinFreq.size === 0) return;
 
-        this.keyToNode.delete(nodeToEvict.key);
+        // Evict the least recently added node with the minimum frequency
+        const nodeToEvict = nodesWithMinFreq.values().next().value;
         nodesWithMinFreq.delete(nodeToEvict);
+        this.keyToNode.delete(nodeToEvict.key);
 
-        if (!nodesWithMinFreq.size) {
+        if (nodesWithMinFreq.size === 0) {
             this.frequencyToNodes.delete(this.minFrequency);
         }
     }

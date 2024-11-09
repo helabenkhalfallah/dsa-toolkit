@@ -18,7 +18,7 @@ class QueueNode<T> {
 export class Queue<T> {
     private head: QueueNode<T> | null = null;
     private tail: QueueNode<T> | null = null;
-    private _size: number = 0;
+    private _size = 0;
 
     /**
      * Gets the number of elements in the queue.
@@ -44,11 +44,10 @@ export class Queue<T> {
         const newNode = new QueueNode(value);
         if (this.tail) {
             this.tail.next = newNode;
+        } else {
+            this.head = newNode; // Set head if queue was empty
         }
         this.tail = newNode;
-        if (!this.head) {
-            this.head = newNode;
-        }
         this._size++;
     }
 
@@ -58,13 +57,13 @@ export class Queue<T> {
      */
     dequeue(): T | undefined {
         if (!this.head) return undefined;
-        const value = this.head.value;
+        const dequeuedValue = this.head.value;
         this.head = this.head.next;
         if (!this.head) {
-            this.tail = null;
+            this.tail = null; // Reset tail if queue becomes empty
         }
         this._size--;
-        return value;
+        return dequeuedValue;
     }
 
     /**
@@ -73,5 +72,14 @@ export class Queue<T> {
      */
     peek(): T | undefined {
         return this.head?.value;
+    }
+
+    /**
+     * Clears all elements from the queue.
+     */
+    clear(): void {
+        this.head = null;
+        this.tail = null;
+        this._size = 0;
     }
 }

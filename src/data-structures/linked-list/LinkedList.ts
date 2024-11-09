@@ -29,6 +29,9 @@ export class LinkedList<T> {
     /** The tail node of the list */
     private tail: LinkedListNode<T> | null = null;
 
+    /** The current size of the list */
+    private _size: number = 0;
+
     /**
      * Inserts a new value at the end of the list.
      * @param {T} value - The value to insert.
@@ -42,6 +45,7 @@ export class LinkedList<T> {
             this.tail!.next = newNode;
             this.tail = newNode;
         }
+        this._size++;
     }
 
     /**
@@ -50,17 +54,17 @@ export class LinkedList<T> {
      * @returns {T | null} - The value at the specified index or null if out of bounds.
      */
     getAt(index: number): T | null {
+        if (index < 0 || index >= this._size) return null;
+
         let current = this.head;
         let currentIndex = 0;
 
         while (current) {
-            if (currentIndex === index) {
-                return current.value;
-            }
+            if (currentIndex === index) return current.value;
             current = current.next;
             currentIndex++;
         }
-        return null; // If index is out of bounds
+        return null;
     }
 
     /**
@@ -89,6 +93,7 @@ export class LinkedList<T> {
         if (this.head.value === value) {
             this.head = this.head.next;
             if (!this.head) this.tail = null;
+            this._size--;
             return;
         }
 
@@ -101,6 +106,38 @@ export class LinkedList<T> {
         if (current.next) {
             current.next = current.next.next;
             if (!current.next) this.tail = current; // Update tail if the last node was deleted
+            this._size--;
         }
+    }
+
+    /**
+     * Gets the current size of the list.
+     * @returns {number} - The number of nodes in the list.
+     */
+    size(): number {
+        return this._size;
+    }
+
+    /**
+     * Converts the list to an array for easy visualization.
+     * @returns {T[]} - An array containing all values in the list.
+     */
+    toArray(): T[] {
+        const result: T[] = [];
+        let current = this.head;
+        while (current) {
+            result.push(current.value);
+            current = current.next;
+        }
+        return result;
+    }
+
+    /**
+     * Clears all nodes from the list, resetting it to an empty state.
+     */
+    clear(): void {
+        this.head = null;
+        this.tail = null;
+        this._size = 0;
     }
 }

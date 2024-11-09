@@ -17,7 +17,7 @@ class StackNode<T> {
  */
 export class Stack<T> {
     private top: StackNode<T> | null = null;
-    private _size: number = 0;
+    private _size = 0;
 
     /**
      * Gets the number of elements in the stack.
@@ -64,5 +64,13 @@ export class Stack<T> {
      */
     peek(): T | undefined {
         return this.top?.value;
+    }
+
+    /**
+     * Clears all elements from the stack.
+     */
+    clear(): void {
+        this.top = null;
+        this._size = 0;
     }
 }

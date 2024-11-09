@@ -1,33 +1,35 @@
 /* eslint-disable @typescript-eslint/no-explicit-any,@typescript-eslint/no-unused-vars */
-import { binarySearch } from './src/algorithms/search/BinarySearch.ts';
-import { exponentialSearch } from './src/algorithms/search/ExponentialSearch.ts';
-import { hybridSearch } from './src/algorithms/search/HybridSearch.ts';
-import { linearSearch } from './src/algorithms/search/LinearSearch.ts';
-import { ternarySearch } from './src/algorithms/search/TernarySearch.ts';
-import { heapSort } from './src/algorithms/sort/HeapSort.ts';
-import { mergeSort } from './src/algorithms/sort/MergeSort.ts';
-import { timSort } from './src/algorithms/sort/TimSort.ts';
-import { LFUCache } from './src/data-structures/cache/LFU.ts';
-import { LRUCache } from './src/data-structures/cache/LRU.ts';
-import { MaxHeap } from './src/data-structures/heaps/MaxHeap.ts';
-import { MinHeap } from './src/data-structures/heaps/MinHeap.ts';
-import { DoublyLinkedList } from './src/data-structures/linked-list/DoublyLinkedList.ts';
-import { LinkedList } from './src/data-structures/linked-list/LinkedList.ts';
-import { HyperLogLog } from './src/data-structures/probabilistic/cardinality/HyperLogLog.ts';
-import { CountMinSketch } from './src/data-structures/probabilistic/frequency/CountMinSketch.ts';
-import { BloomFilter } from './src/data-structures/probabilistic/membership/BloomFilter.ts';
-import { SkipList } from './src/data-structures/probabilistic/ordered/SkipList.ts';
-import { TDigest } from './src/data-structures/probabilistic/quantile/TDigest.ts';
-import { MinHash } from './src/data-structures/probabilistic/similarity/MinHash.ts';
-import { SimHash } from './src/data-structures/probabilistic/similarity/SimHash.ts';
-import { Queue } from './src/data-structures/queue/Queue.ts';
-import { Stack } from './src/data-structures/stack/Stack.ts';
-import { Treap } from './src/data-structures/treaps/Treap.ts';
-import { AVLTree } from './src/data-structures/trees/avl/AVLTree.ts';
-import { BTree } from './src/data-structures/trees/b-tree/BTree.ts';
-import { BinarySearchTree } from './src/data-structures/trees/bst/BinarySearchTree.ts';
-import { RedBlackTree } from './src/data-structures/trees/red-black/RedBlackTree.ts';
-import { Trie } from './src/data-structures/trees/trie/Trie.ts';
+import {
+    AVLTree,
+    BTree,
+    BinarySearchTree,
+    BloomFilter,
+    CountMinSketch,
+    DoublyLinkedList,
+    HyperLogLog,
+    LFUCache,
+    LRUCache,
+    LinkedList,
+    MaxHeap,
+    MinHash,
+    MinHeap,
+    Queue,
+    RedBlackTree,
+    SimHash,
+    SkipList,
+    Stack,
+    TDigest,
+    Treap,
+    Trie,
+    binarySearch,
+    exponentialSearch,
+    heapSort,
+    hybridSearch,
+    linearSearch,
+    mergeSort,
+    ternarySearch,
+    timSort,
+} from './src/index.ts';
 import { measureTime } from './src/utils/PerformanceUtils.ts';
 
 // Dataset configurations
@@ -47,7 +49,7 @@ const WORST_CASE = 'Worst';
  * @returns {any[]} The generated dataset.
  */
 
-function generateNumberData(size: number): any[] {
+function generateNumberData(size: number): number[] {
     return Array.from({ length: size }, () => Math.floor(Math.random() * size));
 }
 
@@ -57,9 +59,11 @@ function generateNumberData(size: number): any[] {
  * @returns {any[]} The generated dataset.
  */
 
-function generateStringData(size: number): any[] {
+function generateStringData(size: number): string[] {
     return Array.from({ length: size }, () => Math.random().toString(36).substring(2, 7));
 }
+
+type ObjectData = { id: number; name: string; value: number };
 
 /**
  * Generates random object data for testing.
@@ -67,7 +71,7 @@ function generateStringData(size: number): any[] {
  * @param {number} size - The number of objects to generate.
  * @returns {any[]} The generated dataset of objects.
  */
-function generateObjectData(size: number): any[] {
+function generateObjectData(size: number): ObjectData[] {
     return Array.from({ length: size }, (_, index) => ({
         id: index + 1,
         name: Math.random().toString(36).substring(2, 7),
@@ -1021,7 +1025,7 @@ function runHyperLogLogBenchmark(dataSize: number) {
  * @param {string} operationCase - The case for benchmarking (Best, Average, Worst).
  */
 function runCountMinSketchBenchmark(dataSize: number, operationCase: string) {
-    const data = generateNumberData(dataSize); // Generate data
+    const data = generateStringData(dataSize); // Generate data
     const countMinSketch = new CountMinSketch(100, 5); // Create Count-Min Sketch instance
 
     console.log(
@@ -1051,7 +1055,7 @@ function runCountMinSketchBenchmark(dataSize: number, operationCase: string) {
  * @param {string} operationCase - The case for benchmarking (Best, Average, Worst).
  */
 function runBloomFilterBenchmark(dataSize: number, operationCase: string) {
-    const data = generateNumberData(dataSize); // Generate data
+    const data = generateStringData(dataSize); // Generate data
     const bloomFilter = new BloomFilter(1000, 5); // Create Bloom Filter instance
 
     console.log(
@@ -1146,7 +1150,7 @@ function runTDigestBenchmark(dataSize: number, operationCase: string) {
  * @param {string} operationCase - The case for benchmarking (Best, Average, Worst).
  */
 function runMinHashBenchmark(dataSize: number, operationCase: string) {
-    const data = generateNumberData(dataSize);
+    const data = generateStringData(dataSize);
     const minHash = new MinHash(128); // Create MinHash instance with 128 hash functions
 
     console.log(`\n=== MinHash Benchmark for Data Size: ${dataSize}, Case: ${operationCase} ===`);
@@ -1175,7 +1179,7 @@ function runMinHashBenchmark(dataSize: number, operationCase: string) {
  * @param {string} operationCase - The case for benchmarking (Best, Average, Worst).
  */
 function runSimHashBenchmark(dataSize: number, operationCase: string) {
-    const data = generateNumberData(dataSize);
+    const data = generateStringData(dataSize);
     const simHash = new SimHash(); // Create SimHash instance
 
     console.log(`\n=== SimHash Benchmark for Data Size: ${dataSize}, Case: ${operationCase} ===`);

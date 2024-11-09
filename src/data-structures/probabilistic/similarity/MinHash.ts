@@ -2,8 +2,8 @@
  * Class representing a MinHash for estimating Jaccard similarity.
  */
 export class MinHash {
-    private hashes: number[];
-    private numHashes: number;
+    private readonly hashes: number[]; // Array of minimum hash values
+    private readonly numHashes: number; // Number of hash functions
 
     /**
      * Creates a MinHash instance.
@@ -11,7 +11,7 @@ export class MinHash {
      */
     constructor(numHashes: number) {
         this.numHashes = numHashes;
-        this.hashes = Array(numHashes).fill(Infinity); // Initialize with infinity
+        this.hashes = Array(numHashes).fill(Infinity); // Initialize all hash values with Infinity
     }
 
     /**
@@ -19,47 +19,50 @@ export class MinHash {
      * @param {Set<string>} elements - The set of elements to add.
      */
     add(elements: Set<string>): void {
-        for (const element of elements) {
+        elements.forEach((element) => {
             for (let i = 0; i < this.numHashes; i++) {
-                const hashValue = this.hash(element, i);
-                if (hashValue < this.hashes[i]) {
-                    this.hashes[i] = hashValue; // Update if new minimum found
-                }
+                const hashValue = this.computeHash(element, i);
+                this.hashes[i] = Math.min(this.hashes[i], hashValue); // Update minimum hash
             }
-        }
+        });
     }
 
     /**
-     * Computes the hash for a given element.
+     * Computes the hash for a given element using a seed for variation.
      * @param {string} element - The element to hash.
      * @param {number} seed - A seed value for the hash function.
      * @returns {number} The hash value.
      */
-    private hash(element: string, seed: number): number {
+    private computeHash(element: string, seed: number): number {
         let hash = 0;
-        for (let i = 0; i < element.length; i++) {
-            hash = (hash * 31 + element.charCodeAt(i) + seed) | 0; // Add seed for variation
+        for (const char of element) {
+            hash = Math.imul(hash, 31) + char.charCodeAt(0) + seed; // Incorporate seed for unique hash
+            hash |= 0; // Convert to 32-bit integer
         }
-        return hash >>> 0; // Convert to unsigned 32-bit integer
+        return hash >>> 0; // Return an unsigned 32-bit integer
     }
 
     /**
-     * Estimates the Jaccard similarity with another MinHash.
+     * Estimates the Jaccard similarity with another MinHash instance.
      * @param {MinHash} other - The other MinHash instance.
-     * @returns {number} The estimated Jaccard similarity.
+     * @returns {number} The estimated Jaccard similarity, or NaN if hash counts differ.
      */
     jaccardSimilarity(other: MinHash): number {
-        let count = 0;
+        if (this.numHashes !== other.numHashes) {
+            throw new Error('Both MinHash instances must have the same number of hash functions.');
+        }
+
+        let matchCount = 0;
         for (let i = 0; i < this.numHashes; i++) {
             if (this.hashes[i] === other.hashes[i]) {
-                count++;
+                matchCount++;
             }
         }
-        return count / this.numHashes; // Return the ratio of common hashes
+        return matchCount / this.numHashes; // Ratio of matching hashes to total hashes
     }
 
     /**
-     * Computes the number of unique hash values stored.
+     * Returns the current number of unique hash values in the MinHash.
      * @returns {number} The number of unique hash values.
      */
     size(): number {

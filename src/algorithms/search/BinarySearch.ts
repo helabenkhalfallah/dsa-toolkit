@@ -1,11 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { timSort } from '../sort/TimSort.ts';
 
 /**
  * Configuration options for the binary search algorithm.
  */
-interface BinarySearchConfig {
-    compareFn: (a: any, b: any) => number; // Custom comparison function
+interface BinarySearchConfig<T> {
+    compareFn: (a: T, b: T) => number; // Custom comparison function
     isSorted?: boolean; // Whether the array is already sorted (default: false)
 }
 
@@ -13,19 +12,17 @@ interface BinarySearchConfig {
  * Performs a binary search on an array with a custom comparison function.
  * If the array is not sorted and `isSorted` is false, TimSort will be applied.
  *
- * @param {any[]} data - The array to search.
- * @param {any} target - The value to search for.
- * @param {BinarySearchConfig} config - Configuration object containing compareFn and isSorted.
+ * @template T - The type of elements in the array.
+ * @param {T[]} data - The array to search.
+ * @param {T} target - The value to search for.
+ * @param {BinarySearchConfig<T>} config - Configuration object containing compareFn and isSorted.
  * @returns {number} The index of the target in the array, or -1 if not found.
  */
-export function binarySearch(data: any[], target: any, config: BinarySearchConfig): number {
+export function binarySearch<T>(data: T[], target: T, config: BinarySearchConfig<T>): number {
     const { compareFn, isSorted = false } = config;
 
     // Step 1: Sort the array if it is not sorted
-    let sortedData = data;
-    if (!isSorted) {
-        sortedData = timSort(data, compareFn);
-    }
+    const sortedData = isSorted ? data : timSort([...data], compareFn); // Use spread operator to avoid mutating original data
 
     // Step 2: Perform binary search
     let left = 0;
