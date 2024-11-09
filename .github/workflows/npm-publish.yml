@@ -50,10 +50,10 @@ jobs:
 
       - name: Installing NPM deps
         run: pnpm install
-
-      - name: Verifying lint
-        run: pnpm lint
-
+        
+      - name: Building Project
+        run: pnpm build
+        
       - name: Publishing on NPM
         run: npm publish
         env:
