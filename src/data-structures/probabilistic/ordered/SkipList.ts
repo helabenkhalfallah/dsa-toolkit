@@ -2,17 +2,17 @@
  * Node class representing each element in the Skip List.
  */
 class SkipListNode<T> {
-    value: T | null; // Value of the node, can be null for head node
+    value: T | null; // The value stored in the node
     forward: Array<SkipListNode<T> | null>; // Array of forward pointers
 
     /**
      * Creates a new SkipListNode.
-     * @param {T | null} value - The value to be stored in the node (null for head).
+     * @param {T | null} value - The value to be stored in the node (can be null for head node).
      * @param {number} level - The level of the node.
      */
     constructor(value: T | null, level: number) {
         this.value = value;
-        this.forward = Array(level + 1).fill(null); // Initialize forward pointers
+        this.forward = Array(level + 1).fill(null);
     }
 }
 
@@ -22,15 +22,15 @@ class SkipListNode<T> {
 export class SkipList<T> {
     private head: SkipListNode<T>; // Head node of the Skip List
     private maxLevel: number; // Maximum level of the Skip List
-    private p: number; // Probability factor for level generation
-    private level: number; // Current level of the Skip List
+    private level: number; // Current highest level of nodes in the Skip List
+    private readonly p: number; // Probability factor for level generation
 
     /**
      * Creates a new SkipList.
      * @param {number} maxLevel - The maximum level of the Skip List.
-     * @param {number} p - Probability factor for level generation (default: 0.5).
+     * @param {number} [p=0.5] - Probability factor for level generation (default is 0.5).
      */
-    constructor(maxLevel: number, p: number = 0.5) {
+    constructor(maxLevel = 16, p = 0.5) {
         this.head = new SkipListNode<T>(null, maxLevel); // Initialize head node
         this.maxLevel = maxLevel;
         this.p = p;
@@ -45,7 +45,7 @@ export class SkipList<T> {
         const update: Array<SkipListNode<T> | null> = Array(this.maxLevel + 1).fill(null);
         let current = this.head;
 
-        // Find the position to insert the new node
+        // Find position to insert the new node
         for (let i = this.level; i >= 0; i--) {
             while (current.forward[i] && current.forward[i]!.value! < value) {
                 current = current.forward[i]!;
@@ -53,9 +53,9 @@ export class SkipList<T> {
             update[i] = current;
         }
 
-        current = current.forward[0]; // Move to the next level down
+        current = current.forward[0];
 
-        // If the value is not already present, insert it
+        // Insert the new node if the value is not already present
         if (!current || current.value !== value) {
             const newLevel = this.randomLevel();
             if (newLevel > this.level) {
@@ -74,24 +74,6 @@ export class SkipList<T> {
     }
 
     /**
-     * Searches for a value in the Skip List.
-     * @param {T} value - The value to search for.
-     * @returns {boolean} True if the value is found, false otherwise.
-     */
-    search(value: T): boolean {
-        let current = this.head;
-
-        for (let i = this.level; i >= 0; i--) {
-            while (current.forward[i] && current.forward[i]!.value! < value) {
-                current = current.forward[i]!;
-            }
-        }
-
-        current = current.forward[0];
-        return current !== null && current.value === value;
-    }
-
-    /**
      * Deletes a value from the Skip List.
      * @param {T} value - The value to delete.
      */
@@ -99,6 +81,7 @@ export class SkipList<T> {
         const update: Array<SkipListNode<T> | null> = Array(this.maxLevel + 1).fill(null);
         let current = this.head;
 
+        // Locate nodes that need their forward pointers updated after deletion
         for (let i = this.level; i >= 0; i--) {
             while (current.forward[i] && current.forward[i]!.value! < value) {
                 current = current.forward[i]!;
@@ -108,17 +91,57 @@ export class SkipList<T> {
 
         current = current.forward[0];
 
+        // If found, remove the node and adjust levels if necessary
         if (current && current.value === value) {
             for (let i = 0; i <= this.level; i++) {
                 if (update[i]!.forward[i] !== current) break;
                 update[i]!.forward[i] = current.forward[i];
             }
 
-            // Adjust the level if necessary
             while (this.level > 0 && !this.head.forward[this.level]) {
                 this.level--;
             }
         }
+    }
+
+    /**
+     * Searches for a value in the Skip List.
+     * @param {T} value - The value to search for.
+     * @returns {boolean} True if the value is found, false otherwise.
+     */
+    find(value: T): boolean {
+        let current = this.head;
+
+        for (let i = this.level; i >= 0; i--) {
+            while (current.forward[i] && current.forward[i]!.value! < value) {
+                current = current.forward[i]!;
+            }
+        }
+
+        current = current.forward[0];
+        return !!current && current.value === value;
+    }
+
+    /**
+     * Retrieves the minimum value in the Skip List.
+     * @returns {T | null} The minimum value or null if the list is empty.
+     */
+    min(): T | null {
+        return this.head.forward[0]?.value || null;
+    }
+
+    /**
+     * Retrieves the maximum value in the Skip List.
+     * @returns {T | null} The maximum value or null if the list is empty.
+     */
+    max(): T | null {
+        let current = this.head;
+        for (let i = this.level; i >= 0; i--) {
+            while (current.forward[i]) {
+                current = current.forward[i]!;
+            }
+        }
+        return current.value;
     }
 
     /**

@@ -1,6 +1,6 @@
 /**
  * Class representing a Max Heap data structure.
- * A Max Heap is a complete binary tree where the value of each node is greater than or equal to the values of its children.
+ * A Max Heap is a complete binary tree where each node's value is greater than or equal to the values of its children.
  *
  * @template T - The type of values stored in the heap.
  */
@@ -9,6 +9,8 @@ export class MaxHeap<T> {
 
     /**
      * Inserts a value into the max heap.
+     * This method places the value at the end of the heap and then performs the bubble-up operation
+     * to maintain the max-heap property, ensuring that each parent node is greater than or equal to its children.
      *
      * @param {T} value - The value to insert into the heap.
      */
@@ -18,8 +20,8 @@ export class MaxHeap<T> {
     }
 
     /**
-     * Bubbles up the last element to maintain the max-heap property.
-     * This method compares the inserted element with its parent and swaps them if the element is greater.
+     * Bubbles up the last element in the heap to maintain the max-heap property.
+     * This method iteratively compares the inserted element with its parent, swapping them if the element is greater.
      *
      * @private
      */
@@ -41,6 +43,8 @@ export class MaxHeap<T> {
 
     /**
      * Extracts the maximum value (root) from the max heap.
+     * After removing the root, it places the last element at the root and performs the bubble-down operation
+     * to restore the max-heap property.
      *
      * @returns {T | null} - The maximum value from the heap, or null if the heap is empty.
      */
@@ -58,7 +62,8 @@ export class MaxHeap<T> {
 
     /**
      * Bubbles down the root element to maintain the max-heap property.
-     * This method compares the root with its children and swaps it with the larger child if necessary.
+     * This method compares the root with its children and swaps it with the larger child if necessary, continuing
+     * until the heap property is restored.
      *
      * @private
      */
@@ -99,7 +104,7 @@ export class MaxHeap<T> {
     }
 
     /**
-     * Gets the value of the root element.
+     * Gets the maximum value in the heap without removing it.
      *
      * @returns {T | null} - The root value of the heap, or null if the heap is empty.
      */
@@ -108,9 +113,9 @@ export class MaxHeap<T> {
     }
 
     /**
-     * Gets the size of the heap.
+     * Returns the number of elements currently in the heap.
      *
-     * @returns {number} - The number of elements in the heap.
+     * @returns {number} - The size of the heap.
      */
     get size(): number {
         return this.heap.length;
@@ -123,5 +128,13 @@ export class MaxHeap<T> {
      */
     isEmpty(): boolean {
         return this.heap.length === 0;
+    }
+
+    /**
+     * Extracts the maximum value (root) from the max heap.
+     * @returns {T | null} - The maximum value from the heap, or null if the heap is empty.
+     */
+    extract(): T | null {
+        return this.extractMax();
     }
 }

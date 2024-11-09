@@ -19,6 +19,7 @@ class TrieNode {
 
 /**
  * Class representing a Trie (Prefix Tree) data structure.
+ * Provides efficient insert, search, delete, and prefix search functionalities.
  */
 export class Trie {
     /** The root node of the Trie */
@@ -87,7 +88,7 @@ export class Trie {
         if (index === word.length) {
             if (!node.isEndOfWord) return false; // Word not found.
             node.isEndOfWord = false; // Unmark end of word.
-            return node.children.size === 0; // If leaf node, signal deletion.
+            return node.children.size === 0; // Return true if the node has no children.
         }
 
         const char = word[index];

@@ -1,11 +1,21 @@
 /**
- * Heapifies a subtree rooted with node i which is an index in arr[].
+ * Recursively heapifies a subtree rooted at the specified index in an array.
+ * - Ensures the subtree satisfies the heap property, where the root is larger (or smaller for a min-heap)
+ *   than its children.
  *
  * @template T - The type of elements in the array.
- * @param {T[]} arr - The array to heapify.
- * @param {number} n - The size of the heap.
- * @param {number} i - The index of the root element.
- * @param {(a: T, b: T) => number} compareFn - A comparison function that defines the sort order.
+ * @param {T[]} arr - The array representing the heap.
+ * @param {number} n - The total size of the heap.
+ * @param {number} i - The index of the root element in the current subtree.
+ * @param {(a: T, b: T) => number} compareFn - A comparison function that defines the heap order.
+ *     Should return a positive number if `a > b`, 0 if `a === b`, and a negative number if `a < b`.
+ *
+ * @example
+ * // Internal usage in heapSort
+ * const arr = [3, 9, 2, 1, 4, 5];
+ * const compareFn = (a, b) => a - b;
+ * heapify(arr, arr.length, 0, compareFn);
+ * // Result may vary based on the array state but ensures heap property at index 0
  */
 // eslint-disable-next-line max-params
 function heapify<T>(arr: T[], n: number, i: number, compareFn: (a: T, b: T) => number): void {
@@ -33,12 +43,28 @@ function heapify<T>(arr: T[], n: number, i: number, compareFn: (a: T, b: T) => n
 }
 
 /**
- * Performs HeapSort on an array.
+ * Sorts an array using the HeapSort algorithm.
+ *
+ * - Converts the array into a max-heap or min-heap based on the `compareFn`.
+ * - Repeatedly extracts the root of the heap to produce a sorted array.
  *
  * @template T - The type of elements in the array.
- * @param {T[]} arr - The array to sort.
+ * @param {T[]} arr - The array to be sorted.
  * @param {(a: T, b: T) => number} compareFn - A comparison function that defines the sort order.
- * @returns {T[]} The sorted array.
+ *     Should return a positive number if `a > b`, 0 if `a === b`, and a negative number if `a < b`.
+ * @returns {T[]} The sorted array, in-place.
+ *
+ * @example
+ * // Basic usage with numbers
+ * const arr = [3, 9, 2, 1, 4, 5];
+ * const sortedArr = heapSort(arr, (a, b) => a - b);
+ * console.log(sortedArr); // [1, 2, 3, 4, 5, 9]
+ *
+ * @example
+ * // Usage with strings
+ * const arr = ['banana', 'apple', 'cherry'];
+ * const sortedArr = heapSort(arr, (a, b) => a.localeCompare(b));
+ * console.log(sortedArr); // ['apple', 'banana', 'cherry']
  */
 export function heapSort<T>(arr: T[], compareFn: (a: T, b: T) => number): T[] {
     const n = arr.length;

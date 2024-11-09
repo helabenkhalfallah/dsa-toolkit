@@ -1,20 +1,43 @@
-import { AVLTreeNode } from './AVLTreeNode.ts';
+/**
+ * Class representing a node in an AVL Tree.
+ * Stores a value and maintains height information for balancing.
+ * @template T - The type of the value stored in the node.
+ */
+export class AVLTreeNode<T> {
+    /** The value stored in the node. */
+    value: T;
+
+    /** The height of the node, used to maintain AVL balance. */
+    height: number = 1;
+
+    /** Pointer to the left child node. */
+    left: AVLTreeNode<T> | null = null;
+
+    /** Pointer to the right child node. */
+    right: AVLTreeNode<T> | null = null;
+
+    /**
+     * Creates an instance of AVLTreeNode.
+     * @param {T} value - The value to store in the node.
+     */
+    constructor(value: T) {
+        this.value = value;
+    }
+}
 
 /**
  * Class representing an AVL Tree, a self-balancing binary search tree.
+ * Ensures that the tree remains balanced after every insertion or deletion, maintaining efficient search, insertion, and deletion.
  * @template T - The type of values stored in the tree.
  */
 export class AVLTree<T> {
-    /**
-     * The root node of the AVL tree.
-     * @type {AVLTreeNode<T> | null}
-     */
+    /** The root node of the AVL tree. */
     root: AVLTreeNode<T> | null = null;
 
     /**
      * Gets the height of a given node.
      * @param {AVLTreeNode<T> | null} node - The node to get the height of.
-     * @returns {number} The height of the node.
+     * @returns {number} The height of the node, or 0 if null.
      * @private
      */
     private getHeight(node: AVLTreeNode<T> | null): number {
@@ -22,7 +45,7 @@ export class AVLTree<T> {
     }
 
     /**
-     * Performs a right rotation on the subtree rooted at a given node.
+     * Performs a right rotation on the subtree rooted at the given node.
      * @param {AVLTreeNode<T>} y - The root of the subtree to rotate.
      * @returns {AVLTreeNode<T>} The new root after rotation.
      * @private
@@ -41,7 +64,7 @@ export class AVLTree<T> {
     }
 
     /**
-     * Performs a left rotation on the subtree rooted at a given node.
+     * Performs a left rotation on the subtree rooted at the given node.
      * @param {AVLTreeNode<T>} x - The root of the subtree to rotate.
      * @returns {AVLTreeNode<T>} The new root after rotation.
      * @private
@@ -60,9 +83,9 @@ export class AVLTree<T> {
     }
 
     /**
-     * Gets the balance factor of a node.
-     * @param {AVLTreeNode<T> | null} node - The node to get the balance factor of.
-     * @returns {number} The balance factor of the node.
+     * Calculates the balance factor of a node to determine if rebalancing is needed.
+     * @param {AVLTreeNode<T> | null} node - The node to calculate the balance factor for.
+     * @returns {number} The balance factor (left height - right height).
      * @private
      */
     private getBalance(node: AVLTreeNode<T> | null): number {
@@ -70,7 +93,7 @@ export class AVLTree<T> {
     }
 
     /**
-     * Inserts a value into the AVL tree.
+     * Inserts a value into the AVL tree, maintaining balance.
      * @param {T} value - The value to insert.
      */
     insert(value: T): void {
@@ -78,8 +101,8 @@ export class AVLTree<T> {
     }
 
     /**
-     * Helper method to recursively insert a value into the tree.
-     * @param {AVLTreeNode<T> | null} node - The current node in the tree.
+     * Helper method to recursively insert a value, balancing the tree as necessary.
+     * @param {AVLTreeNode<T> | null} node - The current node in the traversal.
      * @param {T} value - The value to insert.
      * @returns {AVLTreeNode<T>} The updated node after insertion and rebalancing.
      * @private
@@ -115,21 +138,15 @@ export class AVLTree<T> {
      * @private
      */
     private _search(node: AVLTreeNode<T> | null, value: T): boolean {
-        if (node === null) {
-            return false;
-        }
-        if (value === node.value) {
-            return true;
-        }
-        if (value < node.value) {
-            return this._search(node.left, value);
-        } else {
-            return this._search(node.right, value);
-        }
+        if (!node) return false;
+        if (value === node.value) return true;
+        return value < node.value
+            ? this._search(node.left, value)
+            : this._search(node.right, value);
     }
 
     /**
-     * Deletes a value from the AVL tree.
+     * Deletes a value from the AVL tree, maintaining balance.
      * @param {T} value - The value to delete.
      */
     delete(value: T): void {
@@ -137,14 +154,14 @@ export class AVLTree<T> {
     }
 
     /**
-     * Helper method to recursively delete a value from the tree.
+     * Helper method to recursively delete a value, balancing the tree as needed.
      * @param {AVLTreeNode<T> | null} node - The current node in the tree.
      * @param {T} value - The value to delete.
      * @returns {AVLTreeNode<T> | null} The updated node after deletion and rebalancing.
      * @private
      */
     private _delete(node: AVLTreeNode<T> | null, value: T): AVLTreeNode<T> | null {
-        if (node === null) return node;
+        if (!node) return null;
 
         if (value < node.value) {
             node.left = this._delete(node.left, value);
@@ -155,21 +172,17 @@ export class AVLTree<T> {
                 node = node.left || node.right;
             } else {
                 let successor = node.right;
-                while (successor.left !== null) {
-                    successor = successor.left;
-                }
+                while (successor.left !== null) successor = successor.left;
                 node.value = successor.value;
                 node.right = this._delete(node.right, successor.value);
             }
         }
 
-        if (!node) return node;
-
-        return this.rebalance(node);
+        return node ? this.rebalance(node) : null;
     }
 
     /**
-     * Rebalances the subtree rooted at the given node.
+     * Rebalances the subtree rooted at the specified node if it becomes unbalanced.
      * @param {AVLTreeNode<T>} node - The root of the subtree to rebalance.
      * @returns {AVLTreeNode<T>} The new root of the balanced subtree.
      * @private
@@ -178,20 +191,12 @@ export class AVLTree<T> {
         node.height = Math.max(this.getHeight(node.left), this.getHeight(node.right)) + 1;
         const balance = this.getBalance(node);
 
-        // Left Left Case
-        if (balance > 1 && this.getBalance(node.left) >= 0) {
-            return this.rotateRight(node);
-        }
-        // Left Right Case
+        if (balance > 1 && this.getBalance(node.left) >= 0) return this.rotateRight(node);
         if (balance > 1 && this.getBalance(node.left) < 0) {
             node.left = this.rotateLeft(node.left!);
             return this.rotateRight(node);
         }
-        // Right Right Case
-        if (balance < -1 && this.getBalance(node.right) <= 0) {
-            return this.rotateLeft(node);
-        }
-        // Right Left Case
+        if (balance < -1 && this.getBalance(node.right) <= 0) return this.rotateLeft(node);
         if (balance < -1 && this.getBalance(node.right) > 0) {
             node.right = this.rotateRight(node.right!);
             return this.rotateLeft(node);

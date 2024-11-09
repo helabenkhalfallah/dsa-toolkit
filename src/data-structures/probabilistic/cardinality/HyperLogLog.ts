@@ -1,122 +1,131 @@
 /**
- * Class representing a HyperLogLog data structure.
+ * A HyperLogLog implementation in TypeScript for estimating the cardinality of a set.
+ *
+ * HyperLogLog is a probabilistic data structure used to estimate the number of
+ * distinct elements in a multiset using a small, fixed amount of memory.
+ *
+ * This enhanced version includes options for merging HLLs, configuring accuracy,
+ * and optimized zero-count and hash functions.
+ *
+ * @see https://en.wikipedia.org/wiki/HyperLogLog
+ * @template T - The type of elements to be added to the set.
  */
-export class HyperLogLog {
-    private readonly b: number; // Number of bits used for the register
-    private readonly m: number; // Number of registers
-    private readonly alphaMM: number; // Precomputed constant for bias correction
-    private readonly registers: number[];
+export class HyperLogLog<T> {
+    private readonly m: number;
+    private readonly M: number[];
+    private readonly alphaMM: number;
 
     /**
-     * Creates an instance of HyperLogLog.
-     * @param {number} b - The number of bits used for the register (log2 of the number of registers).
+     * Creates a new HyperLogLog instance.
+     *
+     * @param {number} [p=4] - The log2(m) parameter, where m is the number of registers.
+     *   Must be an integer between 4 and 30 (inclusive).
      */
-    constructor(b: number) {
-        if (b < 4 || b > 16) {
-            throw new Error('Parameter b must be between 4 and 16');
+    constructor(p = 4) {
+        if (!Number.isInteger(p) || p < 4 || p > 30) {
+            throw new Error('p must be an integer between 4 and 30 (inclusive)');
         }
-        this.b = b;
-        this.m = 1 << b; // 2^b
-        this.alphaMM = this.calculateAlphaMM();
-        this.registers = new Array(this.m).fill(0);
+        this.m = 1 << p;
+        this.M = new Array(this.m).fill(0);
+        this.alphaMM = this.computeAlphaMM(this.m);
     }
 
     /**
      * Adds an element to the HyperLogLog.
-     * @param {string} value - The value to be added.
+     *
+     * @param {T} element - The element to add.
      */
-    add(value: string): void {
-        const x = this.hash(value);
-        const j = this.getBucket(x);
-        const w = this.getW(x);
-        const rho = this.calculateRho(w);
-        this.registers[j] = Math.max(this.registers[j], rho);
+    add(element: T): void {
+        const hash = this.hash(element);
+        const j = Number(hash & BigInt(this.m - 1));
+        const w = hash >> BigInt(this.m);
+        const rho = this.countLeadingZeros(w) + 1;
+        this.M[j] = Math.max(this.M[j], rho);
     }
 
     /**
-     * Estimates the number of distinct elements added to the HyperLogLog.
-     * @returns {number} The estimated count of distinct elements.
+     * Estimates the cardinality of the set.
+     *
+     * @returns {number} The estimated cardinality.
      */
-    estimate(): number {
-        const Z = 1 / this.registers.reduce((acc, r) => acc + 1 / Math.pow(2, r), 0);
-        const E = this.alphaMM * Z;
-        return this.correctBias(E);
-    }
+    count(): number {
+        const sum = this.M.reduce((acc, r) => acc + 1 / (1 << r), 0);
+        let estimate = this.alphaMM / sum;
 
-    /**
-     * Hashes a string value to a 32-bit integer using FNV-1a hash function.
-     * @param {string} value - The value to hash.
-     * @returns {number} The hashed value.
-     */
-    private hash(value: string): number {
-        const hash = 2166136261n;
-        const FNV_prime = 16777619n;
-        let h = BigInt(hash);
-
-        for (const char of value) {
-            h ^= BigInt(char.charCodeAt(0));
-            h *= FNV_prime;
+        // Small range correction
+        const zeroCount = this.M.filter((v) => v === 0).length;
+        if (zeroCount > 0 && estimate <= (5 / 2) * this.m) {
+            estimate = this.m * Math.log(this.m / zeroCount);
+        }
+        // Large range correction
+        else if (estimate > (1 / 30) * Math.pow(2, 32)) {
+            estimate = -Math.pow(2, 32) * Math.log(1 - estimate / Math.pow(2, 32));
         }
 
-        return Number(h & 0xffffffffn); // Mask to 32-bit
+        return estimate;
     }
 
     /**
-     * Gets the bucket index for a hashed value.
-     * @param {number} x - The hashed value.
-     * @returns {number} The bucket index.
+     * Merges another HyperLogLog instance into this instance.
+     * Both instances must have the same number of registers.
+     *
+     * @param {HyperLogLog<T>} other - Another HLL instance to merge.
      */
-    private getBucket(x: number): number {
-        return x >>> (32 - this.b); // Use the top b bits
-    }
-
-    /**
-     * Gets the remaining bits after extracting the bucket index.
-     * @param {number} x - The hashed value.
-     * @returns {number} The remaining bits.
-     */
-    private getW(x: number): number {
-        return x & ((1 << (32 - this.b)) - 1); // Extract the remaining bits
-    }
-
-    /**
-     * Calculates the position of the first set bit (1-based).
-     * @param {number} w - The remaining bits.
-     * @returns {number} The position of the first set bit.
-     */
-    private calculateRho(w: number): number {
-        return w === 0 ? 32 - this.b + 1 : Math.clz32(w) + 1;
-    }
-
-    /**
-     * Computes the alphaMM constant for bias correction.
-     * @returns {number} The computed alphaMM.
-     */
-    private calculateAlphaMM(): number {
-        const alpha = 0.7213 / (1 + 1.079 / this.m); // Bias correction constant
-        return alpha * this.m * this.m;
-    }
-
-    /**
-     * Corrects the bias of the estimate.
-     * @param {number} E - The raw estimate.
-     * @returns {number} The corrected estimate.
-     */
-    private correctBias(E: number): number {
-        const V = this.registers.filter((r) => r === 0).length;
-
-        // Small range correction when estimate is less than or equal to 2.5m
-        if (E <= 2.5 * this.m && V > 0) {
-            return this.m * Math.log(this.m / V);
+    merge(other: HyperLogLog<T>): void {
+        if (this.m !== other.m) {
+            throw new Error('Cannot merge HyperLogLogs with different register counts');
         }
-
-        // Large range correction when estimate exceeds a threshold
-        const largeRangeThreshold = 1 << 32;
-        if (E > largeRangeThreshold / 30) {
-            return -largeRangeThreshold * Math.log(1 - E / largeRangeThreshold);
+        for (let i = 0; i < this.m; i++) {
+            this.M[i] = Math.max(this.M[i], other.M[i]);
         }
+    }
 
-        // No correction for intermediate values
-        return E;
+    /**
+     * Computes the alpha constant for bias correction based on the number of registers.
+     *
+     * @param {number} m - The number of registers.
+     * @returns {number} The alpha constant times m squared.
+     * @private
+     */
+    private computeAlphaMM(m: number): number {
+        const alpha =
+            m === 16 ? 0.673 : m === 32 ? 0.697 : m === 64 ? 0.709 : 0.7213 / (1 + 1.079 / m);
+        return alpha * m * m;
+    }
+
+    /**
+     * A simple 64-bit hash function based on FNV-1a.
+     *
+     * @param {T} element - The element to hash.
+     * @returns {bigint} The 64-bit hash value.
+     * @private
+     */
+    private hash(element: T): bigint {
+        const str = JSON.stringify(element);
+        let hash = BigInt('0xcbf29ce484222325');
+        const prime = BigInt('0x100000001b3');
+        for (let i = 0; i < str.length; i++) {
+            hash ^= BigInt(str.charCodeAt(i));
+            hash *= prime;
+            hash &= BigInt('0xffffffffffffffff'); // Maintain 64-bit range
+        }
+        return hash;
+    }
+
+    /**
+     * Counts the number of leading zeros in a 64-bit integer.
+     *
+     * @param {bigint} x - The 64-bit integer.
+     * @returns {number} The number of leading zeros.
+     * @private
+     */
+    private countLeadingZeros(x: bigint): number {
+        if (x === 0n) return 64;
+        let count = 0;
+        for (let i = 63; i >= 0; i--) {
+            if ((x >> BigInt(i)) & 1n) break;
+            count++;
+        }
+        return count;
     }
 }

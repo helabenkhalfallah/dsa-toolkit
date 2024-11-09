@@ -1,15 +1,17 @@
 /**
  * Class representing a node in a doubly linked list.
+ * Each node stores a value and has pointers to both its previous and next nodes.
+ *
  * @template T - The type of value stored in the node.
  */
 class DoublyLinkedListNode<T> {
-    /** The value stored in the node */
+    /** The value stored in the node. */
     value: T;
 
-    /** Pointer to the next node in the list */
+    /** Pointer to the next node in the list. */
     next: DoublyLinkedListNode<T> | null = null;
 
-    /** Pointer to the previous node in the list */
+    /** Pointer to the previous node in the list. */
     prev: DoublyLinkedListNode<T> | null = null;
 
     /**
@@ -23,20 +25,24 @@ class DoublyLinkedListNode<T> {
 
 /**
  * Class representing a doubly linked list.
+ * A doubly linked list allows traversal in both forward and backward directions.
+ *
  * @template T - The type of values stored in the list.
  */
 export class DoublyLinkedList<T> {
-    /** The head node of the list */
+    /** The head node of the list. */
     private head: DoublyLinkedListNode<T> | null = null;
 
-    /** The tail node of the list */
+    /** The tail node of the list. */
     private tail: DoublyLinkedListNode<T> | null = null;
 
-    /** The current size of the list */
+    /** The current size of the list. */
     private _size: number = 0;
 
     /**
      * Inserts a new value at the end of the list.
+     * Updates the tail pointer and, if the list was empty, also sets the head.
+     *
      * @param {T} value - The value to insert.
      */
     insert(value: T): void {
@@ -54,9 +60,10 @@ export class DoublyLinkedList<T> {
 
     /**
      * Retrieves the value at a specified index.
-     * Optimizes traversal by choosing direction based on the index.
+     * Optimizes traversal by determining whether to start from the head or tail based on the index.
+     *
      * @param {number} index - The index of the value to retrieve.
-     * @returns {T | null} - The value at the specified index or null if out of bounds.
+     * @returns {T | null} - The value at the specified index, or null if out of bounds.
      */
     getAt(index: number): T | null {
         if (index < 0 || index >= this._size) return null;
@@ -86,6 +93,8 @@ export class DoublyLinkedList<T> {
 
     /**
      * Searches for a value in the list.
+     * Traverses from the head to the tail and returns true upon finding the value.
+     *
      * @param {T} value - The value to search for.
      * @returns {boolean} - True if the value is found, otherwise false.
      */
@@ -99,8 +108,9 @@ export class DoublyLinkedList<T> {
     }
 
     /**
-     * Deletes a value from the list.
-     * Removes the first occurrence of the specified value.
+     * Deletes a value from the list by removing the first occurrence.
+     * Adjusts head, tail, and neighboring nodes as necessary.
+     *
      * @param {T} value - The value to delete.
      */
     delete(value: T): void {
@@ -127,6 +137,7 @@ export class DoublyLinkedList<T> {
 
     /**
      * Gets the current size of the list.
+     *
      * @returns {number} - The number of nodes in the list.
      */
     size(): number {
@@ -134,7 +145,8 @@ export class DoublyLinkedList<T> {
     }
 
     /**
-     * Converts the list to an array for easy visualization.
+     * Converts the list to an array for easier visualization or processing.
+     *
      * @returns {T[]} - An array containing all values in the list.
      */
     toArray(): T[] {

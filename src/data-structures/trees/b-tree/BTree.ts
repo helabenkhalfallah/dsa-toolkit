@@ -1,23 +1,51 @@
-import { BTreeNode } from './BTreeNode.ts';
+/**
+ * Class representing a node in the B-Tree.
+ * Each node contains a list of keys and a list of child nodes, forming the structure of the B-Tree.
+ * @template T - The type of keys stored in the node.
+ */
+export class BTreeNode<T> {
+    /** Array of keys in the node. */
+    keys: T[] = [];
+
+    /** Array of child nodes. */
+    children: BTreeNode<T>[] = [];
+
+    /** Indicates whether the node is a leaf. */
+    leaf: boolean;
+
+    /**
+     * Creates an instance of BTreeNode.
+     * @param {boolean} leaf - Indicates whether the node is a leaf.
+     */
+    constructor(leaf: boolean) {
+        this.leaf = leaf;
+    }
+}
 
 /**
- * Class representing a B-Tree data structure.
- * @template T - The type of the keys stored in the tree.
+ * Class representing a B-Tree, a balanced tree structure for efficient insertion, deletion, and search operations.
+ * Each node can have a variable number of keys and child nodes, based on the minimum degree.
+ * @template T - The type of keys stored in the tree.
  */
 export class BTree<T> {
     private root: BTreeNode<T> | null = null;
-    private readonly t: number;
+    private readonly t: number; // Minimum degree (defines the range for the number of keys in nodes)
+    private _version = 0;
+    private comparator: (a: T, b: T) => number;
 
     /**
      * Creates an instance of BTree.
      * @param {number} t - Minimum degree (defines the range for the number of keys in nodes).
+     * @param comparator - A comparator function for comparing keys.
      */
-    constructor(t: number) {
+    constructor(t: number, comparator: (a: T, b: T) => number) {
+        if (t < 2) throw new Error('Minimum degree must be at least 2');
         this.t = t;
+        this.comparator = comparator;
     }
 
     /**
-     * Searches for a key in the B-Tree.
+     * Searches for a key in the B-Tree, starting from the root or a specified node.
      * @param {T} key - The key to search for.
      * @param {BTreeNode<T> | null} [node=this.root] - The node to start the search from.
      * @returns {BTreeNode<T> | null} - The node containing the key, or null if not found.
@@ -26,23 +54,21 @@ export class BTree<T> {
         if (!node) return null;
 
         let i = 0;
-        while (i < node.keys.length && key > node.keys[i]) {
+        while (i < node.keys.length && this.comparator(key, node.keys[i]) > 0) {
             i++;
         }
 
-        if (i < node.keys.length && node.keys[i] === key) {
+        if (i < node.keys.length && this.comparator(key, node.keys[i]) === 0) {
             return node;
         }
 
-        if (node.leaf) {
-            return null;
-        } else {
-            return this.search(key, node.children[i]);
-        }
+        if (node.leaf) return null;
+
+        return this.search(key, node.children[i]);
     }
 
     /**
-     * Inserts a key into the B-Tree.
+     * Inserts a key into the B-Tree, balancing nodes as needed.
      * @param {T} key - The key to insert.
      */
     insert(key: T): void {
@@ -61,24 +87,21 @@ export class BTree<T> {
     }
 
     /**
-     * Deletes a key from the B-Tree.
+     * Deletes a key from the B-Tree, adjusting nodes to maintain the B-Tree properties.
      * @param {T} key - The key to delete.
      */
     delete(key: T): void {
         if (!this.root) return;
+
         this.deleteFromNode(this.root, key);
 
         if (this.root.keys.length === 0) {
-            if (!this.root.leaf) {
-                this.root = this.root.children[0];
-            } else {
-                this.root = null;
-            }
+            this.root = this.root.leaf ? null : this.root.children[0];
         }
     }
 
     /**
-     * Inserts a key into a non-full node.
+     * Inserts a key into a non-full node, maintaining the sorted order of keys within the node.
      * @param {BTreeNode<T>} node - The node to insert into.
      * @param {T} key - The key to insert.
      * @private
@@ -87,17 +110,19 @@ export class BTree<T> {
         let i = node.keys.length - 1;
 
         if (node.leaf) {
-            node.keys.push(key);
-            node.keys.sort((a, b) => (a < b ? -1 : 1));
+            while (i >= 0 && this.comparator(key, node.keys[i]) < 0) {
+                i--;
+            }
+            node.keys.splice(i + 1, 0, key);
         } else {
-            while (i >= 0 && key < node.keys[i]) {
+            while (i >= 0 && this.comparator(key, node.keys[i]) < 0) {
                 i--;
             }
             i++;
 
             if (node.children[i].keys.length === 2 * this.t - 1) {
                 this.splitChild(node, i, node.children[i]);
-                if (key > node.keys[i]) {
+                if (this.comparator(key, node.keys[i]) > 0) {
                     i++;
                 }
             }
@@ -106,18 +131,17 @@ export class BTree<T> {
     }
 
     /**
-     * Splits a child node.
+     * Splits a child node of a parent node when it exceeds the maximum number of keys.
      * @param {BTreeNode<T>} parent - The parent node.
      * @param {number} i - The index of the child to split.
      * @param {BTreeNode<T>} child - The child node to split.
      * @private
      */
     private splitChild(parent: BTreeNode<T>, i: number, child: BTreeNode<T>): void {
-        const newNode = new BTreeNode<T>(child.leaf);
         const t = this.t;
+        const newNode = new BTreeNode<T>(child.leaf);
 
         newNode.keys = child.keys.splice(t, t - 1);
-
         if (!child.leaf) {
             newNode.children = child.children.splice(t);
         }
@@ -127,7 +151,7 @@ export class BTree<T> {
     }
 
     /**
-     * Deletes a key from a specific node.
+     * Deletes a key from a specific node, adjusting the tree as necessary.
      * @param {BTreeNode<T>} node - The node to delete from.
      * @param {T} key - The key to delete.
      * @private
@@ -135,7 +159,7 @@ export class BTree<T> {
     private deleteFromNode(node: BTreeNode<T>, key: T): void {
         if (!node) return;
 
-        const i = node.keys.findIndex((k) => k === key);
+        const i = node.keys.findIndex((k) => this.comparator(k, key) === 0);
 
         if (i !== -1) {
             if (node.leaf) {
@@ -155,17 +179,10 @@ export class BTree<T> {
                 }
             }
         } else {
-            if (node.leaf) {
-                return;
-            }
+            if (node.leaf) return;
 
-            let childIndex = node.keys.length;
-            for (let j = 0; j < node.keys.length; j++) {
-                if (key < node.keys[j]) {
-                    childIndex = j;
-                    break;
-                }
-            }
+            let childIndex = node.keys.findIndex((k) => this.comparator(key, k) < 0);
+            if (childIndex === -1) childIndex = node.children.length - 1;
 
             if (node.children[childIndex].keys.length < this.t) {
                 this.fill(node, childIndex);
@@ -176,9 +193,9 @@ export class BTree<T> {
     }
 
     /**
-     * Gets the predecessor key of a given key.
-     * @param {BTreeNode<T>} node - The node to find the predecessor for.
-     * @param {number} idx - The index of the key in the node.
+     * Gets the predecessor key of a specified key within a node.
+     * @param {BTreeNode<T>} node - The node.
+     * @param {number} idx - The index of the key.
      * @returns {T} - The predecessor key.
      * @private
      */
@@ -191,9 +208,9 @@ export class BTree<T> {
     }
 
     /**
-     * Gets the successor key of a given key.
-     * @param {BTreeNode<T>} node - The node to find the successor for.
-     * @param {number} idx - The index of the key in the node.
+     * Gets the successor key of a specified key within a node.
+     * @param {BTreeNode<T>} node - The node.
+     * @param {number} idx - The index of the key.
      * @returns {T} - The successor key.
      * @private
      */
@@ -206,9 +223,9 @@ export class BTree<T> {
     }
 
     /**
-     * Fills a child node at a given index if it has less than `t` keys.
+     * Ensures a child node has at least the minimum number of keys by borrowing or merging nodes.
      * @param {BTreeNode<T>} node - The parent node.
-     * @param {number} i - The index of the child to fill.
+     * @param {number} i - The index of the child node.
      * @private
      */
     private fill(node: BTreeNode<T>, i: number): void {
@@ -226,7 +243,7 @@ export class BTree<T> {
     }
 
     /**
-     * Borrows a key from the previous sibling.
+     * Borrows a key from the previous sibling of a specified child.
      * @param {BTreeNode<T>} node - The parent node.
      * @param {number} i - The index of the child to borrow into.
      * @private
@@ -244,7 +261,7 @@ export class BTree<T> {
     }
 
     /**
-     * Borrows a key from the next sibling.
+     * Borrows a key from the next sibling of a specified child.
      * @param {BTreeNode<T>} node - The parent node.
      * @param {number} i - The index of the child to borrow into.
      * @private
@@ -262,7 +279,7 @@ export class BTree<T> {
     }
 
     /**
-     * Merges two child nodes at a given index.
+     * Merges a child with its next sibling and adjusts the parent's keys and children.
      * @param {BTreeNode<T>} node - The parent node.
      * @param {number} i - The index of the child to merge.
      * @private
@@ -272,13 +289,29 @@ export class BTree<T> {
         const sibling = node.children[i + 1];
 
         child.keys.push(node.keys[i]);
-        child.keys = child.keys.concat(sibling.keys);
-
+        child.keys.push(...sibling.keys);
         if (!child.leaf) {
-            child.children = child.children.concat(sibling.children);
+            child.children.push(...sibling.children);
         }
 
         node.keys.splice(i, 1);
         node.children.splice(i + 1, 1);
+    }
+
+    /**
+     * Prints the B-Tree structure for visualization, showing levels and keys at each node.
+     * @param node - The node to print (default is the root).
+     * @param depth - The current level of the node.
+     * @returns {string} - The string representation of the tree.
+     */
+    print(node: BTreeNode<T> = this.root, depth: number = 0): string {
+        if (!node) return '';
+        let result = '  '.repeat(depth) + `Level ${depth}: ${node.keys.join(', ')}\n`;
+        if (!node.leaf) {
+            node.children.forEach((child) => {
+                result += this.print(child, depth + 1);
+            });
+        }
+        return result;
     }
 }

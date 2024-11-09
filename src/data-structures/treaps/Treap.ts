@@ -1,12 +1,14 @@
 /**
- * Class representing a node in the Treap.
+ * Class representing a node in the Treap, combining a value with a priority.
+ * Used as the building block for the Treap data structure.
+ *
  * @template T - The type of value stored in the node.
  */
 class TreapNode<T> {
     /** The value stored in the node. */
     value: T;
 
-    /** The priority of the node, used for heap property. */
+    /** The priority of the node, used to maintain the heap property in the Treap. */
     priority: number;
 
     /** Pointer to the left child node. */
@@ -29,14 +31,16 @@ class TreapNode<T> {
 }
 
 /**
- * Class representing a Treap, a combination of a binary search tree and a heap.
+ * Treap data structure combining properties of a Binary Search Tree and a Max Heap.
+ * Each node satisfies both the BST property (left < root < right) and the heap property based on priority.
+ *
  * @template T - The type of values stored in the Treap.
  */
 export class Treap<T> {
     /** The root node of the Treap. */
     private root: TreapNode<T> | null = null;
 
-    /** Custom comparison function for values in the Treap. */
+    /** Comparison function for values in the Treap, allowing custom sorting logic. */
     private compareFn: (a: T, b: T) => number;
 
     /**
@@ -48,22 +52,22 @@ export class Treap<T> {
     }
 
     /**
-     * Inserts a value into the Treap.
+     * Inserts a value into the Treap with a specified priority.
      * @param {T} value - The value to insert.
      * @param {number} priority - The priority of the value.
-     * @returns {boolean} - True if insertion was successful.
+     * @returns {boolean} - Always returns true as insertion is successful.
      */
     insert(value: T, priority: number): boolean {
         this.root = this._insert(this.root, value, priority);
-        return true; // Always succeeds in insertion
+        return true;
     }
 
     /**
-     * Helper method to insert a value recursively.
-     * @param {TreapNode<T> | null} node - The current node.
+     * Recursively inserts a value into the Treap, rebalancing as needed.
+     * @param {TreapNode<T> | null} node - The current node in the recursive traversal.
      * @param {T} value - The value to insert.
      * @param {number} priority - The priority of the value.
-     * @returns {TreapNode<T>} - The updated node after insertion.
+     * @returns {TreapNode<T>} - The updated subtree with the inserted value.
      * @private
      */
     private _insert(node: TreapNode<T> | null, value: T, priority: number): TreapNode<T> {
@@ -85,9 +89,9 @@ export class Treap<T> {
     }
 
     /**
-     * Rotates the node to the right.
-     * @param {TreapNode<T>} node - The node to rotate.
-     * @returns {TreapNode<T>} - The new root after rotation.
+     * Rotates the subtree to the right, promoting the left child.
+     * @param {TreapNode<T>} node - The root of the subtree to rotate.
+     * @returns {TreapNode<T>} - The new root of the rotated subtree.
      * @private
      */
     private rotateRight(node: TreapNode<T>): TreapNode<T> {
@@ -98,9 +102,9 @@ export class Treap<T> {
     }
 
     /**
-     * Rotates the node to the left.
-     * @param {TreapNode<T>} node - The node to rotate.
-     * @returns {TreapNode<T>} - The new root after rotation.
+     * Rotates the subtree to the left, promoting the right child.
+     * @param {TreapNode<T>} node - The root of the subtree to rotate.
+     * @returns {TreapNode<T>} - The new root of the rotated subtree.
      * @private
      */
     private rotateLeft(node: TreapNode<T>): TreapNode<T> {
@@ -120,8 +124,8 @@ export class Treap<T> {
     }
 
     /**
-     * Helper method to search for a value recursively.
-     * @param {TreapNode<T> | null} node - The current node.
+     * Recursively searches for a value in the Treap.
+     * @param {TreapNode<T> | null} node - The current node in the recursive search.
      * @param {T} value - The value to search for.
      * @returns {boolean} - True if the value is found, false otherwise.
      * @private
@@ -146,10 +150,10 @@ export class Treap<T> {
     }
 
     /**
-     * Helper method to delete a value recursively.
-     * @param {TreapNode<T> | null} node - The current node.
+     * Recursively deletes a value from the Treap, rebalancing as needed.
+     * @param {TreapNode<T> | null} node - The current node in the recursive traversal.
      * @param {T} value - The value to delete.
-     * @returns {TreapNode<T> | null} - The updated node after deletion.
+     * @returns {TreapNode<T> | null} - The updated subtree with the value removed.
      * @private
      */
     private _delete(node: TreapNode<T> | null, value: T): TreapNode<T> | null {
@@ -160,11 +164,9 @@ export class Treap<T> {
         } else if (this.compareFn(value, node.value) > 0) {
             node.right = this._delete(node.right, value);
         } else {
-            // Node to delete found
             if (!node.left) return node.right;
             if (!node.right) return node.left;
 
-            // Node has two children, rotate and delete
             if (node.left.priority > node.right.priority) {
                 node = this.rotateRight(node);
                 node.right = this._delete(node.right, value);
@@ -177,10 +179,10 @@ export class Treap<T> {
     }
 
     /**
-     * In-order traversal for testing or debugging.
+     * Performs an in-order traversal of the Treap for testing or debugging purposes.
      * @param {TreapNode<T> | null} [node=this.root] - The starting node (default is root).
-     * @param {Array<T>} [result=[]] - Array to store traversal result.
-     * @returns {Array<T>} - In-order traversal result.
+     * @param {Array<T>} [result=[]] - Accumulator for traversal result.
+     * @returns {Array<T>} - The in-order traversal of the Treap values.
      */
     inOrderTraversal(node: TreapNode<T> | null = this.root, result: Array<T> = []): Array<T> {
         if (!node) return result;

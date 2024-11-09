@@ -1,8 +1,16 @@
 /**
- * Class representing a node in the LFU Cache.
- * Each node stores a key, value, and its frequency of access.
+ * Class representing a node in the LFU (Least Frequently Used) Cache.
+ * Each node stores a key, a value, and the frequency of access to manage caching based on usage frequency.
+ *
+ * @template K - The type of key.
+ * @template V - The type of value.
  */
 class LFUNode<K, V> {
+    /**
+     * @param {K} key - The unique key associated with this cache entry.
+     * @param {V} value - The value associated with this entry.
+     * @param {number} [frequency=1] - The frequency of access for the node (default is 1).
+     */
     constructor(
         public key: K,
         public value: V,
@@ -12,10 +20,18 @@ class LFUNode<K, V> {
 
 /**
  * Class representing an LFU (Least Frequently Used) Cache.
- * The cache evicts the least frequently used items when the capacity is reached.
+ * Evicts the least frequently used items when the cache reaches its maximum capacity.
  *
  * @template K - The type of keys stored in the cache.
  * @template V - The type of values stored in the cache.
+ *
+ * @example
+ * const cache = new LFUCache<string, number>(2); // Cache with capacity of 2 items
+ * cache.put('a', 1);
+ * cache.put('b', 2);
+ * console.log(cache.get('a')); // Outputs: 1
+ * cache.put('c', 3);           // 'b' is evicted because it is the least frequently used
+ * console.log(cache.get('b')); // Outputs: null (since 'b' was evicted)
  */
 export class LFUCache<K, V> {
     private capacity: number;
@@ -36,8 +52,7 @@ export class LFUCache<K, V> {
     }
 
     /**
-     * Retrieves a value from the cache by key.
-     * Updates the frequency of the accessed node.
+     * Retrieves a value from the cache by key and updates the node's frequency.
      *
      * @param {K} key - The key to retrieve from the cache.
      * @returns {V | null} - The value associated with the key, or null if not found.
@@ -51,8 +66,7 @@ export class LFUCache<K, V> {
     }
 
     /**
-     * Adds a key-value pair to the cache.
-     * If the cache exceeds its capacity, it evicts the least frequently used item.
+     * Adds a key-value pair to the cache. If the cache exceeds its capacity, it evicts the least frequently used item.
      *
      * @param {K} key - The key to add to the cache.
      * @param {V} value - The value to associate with the key.
@@ -62,7 +76,7 @@ export class LFUCache<K, V> {
 
         if (this.keyToNode.has(key)) {
             const node = this.keyToNode.get(key)!;
-            node.value = value; // Update the value
+            node.value = value; // Update value
             this.updateNodeFrequency(node);
         } else {
             if (this.keyToNode.size >= this.capacity) {
@@ -76,9 +90,9 @@ export class LFUCache<K, V> {
     }
 
     /**
-     * Updates the frequency of a node.
+     * Updates the frequency of a node and repositions it in the frequency map.
      *
-     * @param {LFUNode<K, V>} node - The node to update.
+     * @param {LFUNode<K, V>} node - The node whose frequency needs updating.
      * @private
      */
     private updateNodeFrequency(node: LFUNode<K, V>): void {
@@ -88,7 +102,6 @@ export class LFUCache<K, V> {
         this.removeNodeFromFrequency(node, oldFrequency);
         this.addNodeToFrequency(node, node.frequency);
 
-        // Update minFrequency if necessary
         if (oldFrequency === this.minFrequency && !this.frequencyToNodes.get(oldFrequency)?.size) {
             this.minFrequency++;
         }
@@ -126,7 +139,7 @@ export class LFUCache<K, V> {
     }
 
     /**
-     * Evicts the least frequently used node from the cache.
+     * Evicts the least frequently used node from the cache, which is the oldest entry at the minimum frequency.
      *
      * @private
      */

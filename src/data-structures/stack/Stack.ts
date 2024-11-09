@@ -1,5 +1,14 @@
+/**
+ * Represents a node in the Stack.
+ * Each node holds a value and a pointer to the next node in the stack.
+ *
+ * @template T - The type of value stored in the node.
+ */
 class StackNode<T> {
+    /** The value stored in the node */
     value: T;
+
+    /** Pointer to the next node in the stack, or null if none */
     next: StackNode<T> | null = null;
 
     /**
@@ -12,11 +21,16 @@ class StackNode<T> {
 }
 
 /**
- * Stack data structure implemented with a linked list for O(1) push and pop operations.
+ * Stack data structure implemented with a linked list for efficient O(1) push and pop operations.
+ * Supports standard stack operations such as push, pop, and peek.
+ *
  * @template T - The type of elements held in the stack.
  */
 export class Stack<T> {
+    /** The top node of the stack, or null if the stack is empty */
     private top: StackNode<T> | null = null;
+
+    /** The current number of elements in the stack */
     private _size = 0;
 
     /**
@@ -29,7 +43,7 @@ export class Stack<T> {
 
     /**
      * Checks if the stack is empty.
-     * @returns {boolean} True if the stack is empty, false otherwise.
+     * @returns {boolean} True if the stack is empty, otherwise false.
      */
     isEmpty(): boolean {
         return this._size === 0;
@@ -67,7 +81,7 @@ export class Stack<T> {
     }
 
     /**
-     * Clears all elements from the stack.
+     * Clears all elements from the stack, resetting it to an empty state.
      */
     clear(): void {
         this.top = null;

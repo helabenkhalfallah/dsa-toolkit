@@ -1,5 +1,14 @@
+/**
+ * Represents a node in the Queue.
+ * Each node holds a value and a pointer to the next node.
+ *
+ * @template T - The type of value stored in the node.
+ */
 class QueueNode<T> {
+    /** The value stored in the node */
     value: T;
+
+    /** Pointer to the next node in the queue, or null if none */
     next: QueueNode<T> | null = null;
 
     /**
@@ -12,12 +21,19 @@ class QueueNode<T> {
 }
 
 /**
- * Queue data structure implemented with a linked list for O(1) enqueue and dequeue operations.
+ * Queue data structure implemented with a linked list for efficient O(1) enqueue and dequeue operations.
+ * Supports standard queue operations such as enqueue, dequeue, and peek.
+ *
  * @template T - The type of elements held in the queue.
  */
 export class Queue<T> {
+    /** The head (front) node of the queue, or null if the queue is empty */
     private head: QueueNode<T> | null = null;
+
+    /** The tail (back) node of the queue, or null if the queue is empty */
     private tail: QueueNode<T> | null = null;
+
+    /** The current number of elements in the queue */
     private _size = 0;
 
     /**
@@ -30,7 +46,7 @@ export class Queue<T> {
 
     /**
      * Checks if the queue is empty.
-     * @returns {boolean} True if the queue is empty, false otherwise.
+     * @returns {boolean} True if the queue is empty, otherwise false.
      */
     isEmpty(): boolean {
         return this._size === 0;
@@ -45,7 +61,7 @@ export class Queue<T> {
         if (this.tail) {
             this.tail.next = newNode;
         } else {
-            this.head = newNode; // Set head if queue was empty
+            this.head = newNode; // Set head if the queue was empty
         }
         this.tail = newNode;
         this._size++;
@@ -60,7 +76,7 @@ export class Queue<T> {
         const dequeuedValue = this.head.value;
         this.head = this.head.next;
         if (!this.head) {
-            this.tail = null; // Reset tail if queue becomes empty
+            this.tail = null; // Reset tail if the queue becomes empty
         }
         this._size--;
         return dequeuedValue;
@@ -75,7 +91,7 @@ export class Queue<T> {
     }
 
     /**
-     * Clears all elements from the queue.
+     * Clears all elements from the queue, resetting it to an empty state.
      */
     clear(): void {
         this.head = null;

@@ -1,6 +1,7 @@
 /**
  * Class representing a Min Heap data structure.
  * A Min Heap is a complete binary tree where the value of each node is less than or equal to the values of its children.
+ * The root of the tree (the minimum element) can be efficiently accessed or removed, while maintaining heap order.
  *
  * @template T - The type of values stored in the heap.
  */
@@ -9,6 +10,8 @@ export class MinHeap<T> {
 
     /**
      * Inserts a value into the min heap.
+     * This operation places the value at the end of the heap and then performs the bubble-up operation
+     * to maintain the min-heap property, ensuring that each parent node is less than or equal to its children.
      *
      * @param {T} value - The value to insert into the heap.
      */
@@ -18,8 +21,8 @@ export class MinHeap<T> {
     }
 
     /**
-     * Bubbles up the last element to maintain the min-heap property.
-     * This method compares the inserted element with its parent and swaps them if the element is less.
+     * Bubbles up the last element in the heap to maintain the min-heap property.
+     * This method iteratively compares the inserted element with its parent, swapping them if the element is smaller.
      *
      * @private
      */
@@ -41,6 +44,8 @@ export class MinHeap<T> {
 
     /**
      * Extracts the minimum value (root) from the min heap.
+     * After removing the root, it places the last element at the root and performs the bubble-down operation
+     * to restore the min-heap property.
      *
      * @returns {T | null} - The minimum value from the heap, or null if the heap is empty.
      */
@@ -58,7 +63,8 @@ export class MinHeap<T> {
 
     /**
      * Bubbles down the root element to maintain the min-heap property.
-     * This method compares the root with its children and swaps it with the smaller child if necessary.
+     * This method compares the root with its children and swaps it with the smaller child if necessary,
+     * continuing until the heap property is restored.
      *
      * @private
      */
@@ -99,7 +105,7 @@ export class MinHeap<T> {
     }
 
     /**
-     * Gets the value of the root element (minimum element).
+     * Gets the minimum value in the heap without removing it.
      *
      * @returns {T | null} - The root value of the heap, or null if the heap is empty.
      */
@@ -108,9 +114,9 @@ export class MinHeap<T> {
     }
 
     /**
-     * Gets the size of the heap.
+     * Returns the number of elements currently in the heap.
      *
-     * @returns {number} - The number of elements in the heap.
+     * @returns {number} - The size of the heap.
      */
     get size(): number {
         return this.heap.length;
@@ -123,5 +129,13 @@ export class MinHeap<T> {
      */
     isEmpty(): boolean {
         return this.heap.length === 0;
+    }
+
+    /**
+     * Extracts the minimum value (root) from the min heap.
+     * @returns {T | null} - The minimum value from the heap, or null if the heap is empty.
+     */
+    extract(): T | null {
+        return this.extractMin();
     }
 }

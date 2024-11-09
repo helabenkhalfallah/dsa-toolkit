@@ -5,7 +5,7 @@ import { configDefaults, defineConfig } from 'vitest/config';
  */
 export default defineConfig({
     test: {
-        environment: 'jsdom',
+        environment: 'node',
         exclude: [...configDefaults.exclude],
         include: [
             ...configDefaults.include,
@@ -20,6 +20,9 @@ export default defineConfig({
                 '**/config/**',
                 '**/database/**',
                 '**/**Worker*.*',
+                '**/index.ts',
+                '**/index.js',
+                '**/PerformanceUtils.ts',
             ],
         },
     },
