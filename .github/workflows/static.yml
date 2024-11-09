@@ -22,7 +22,28 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # Single deploy job since we're just deploying
+  # Creating and Updating documentation
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Installing pnpm 
+        run: npm install -g pnpm 
+
+      - name: Installing NPM deps
+        run: pnpm install
+        
+      - name: Documentation Update
+        run: pnpm update-docs
+        
+  # Deploy documentation on github-pages
   deploy:
     environment:
       name: github-pages
