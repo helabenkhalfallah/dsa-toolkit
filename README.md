@@ -17,114 +17,90 @@ A powerful toolkit for data structures and algorithms in TypeScript, designed fo
 ## Benchmarks
 
 ### Data Structures Benchmarks
-┌─────────┬──────────────────────┬────────────────────┬─────────┬───────────────────────┐
-│ (index) │ dataStructure        │ operation          │ size    │ time (ms)             │
-├─────────┼──────────────────────┼────────────────────┼─────────┼───────────────────────┤
-│ 0       │ 'Native Array'       │ 'Insert'           │ 1000    │ 0.004207999999948697  │
-│ 1       │ 'Native Array'       │ 'Search'           │ 1000    │ 0.0015419999999721767 │
-│ 2       │ 'Native Array'       │ 'Delete'           │ 1000    │ 0.0007909999999355932 │
-│ 3       │ 'Queue'              │ 'Insert (Enqueue)' │ 1000    │ 0.1306250000000091    │
-│ 4       │ 'Queue'              │ 'Delete (Dequeue)' │ 1000    │ 0.13549999999997908   │
-│ 5       │ 'Stack'              │ 'Insert (Push)'    │ 1000    │ 0.12162500000010823   │
-│ 6       │ 'Stack'              │ 'Delete (Pop)'     │ 1000    │ 0.11275000000000546   │
-│ 7       │ 'Binary Search Tree' │ 'Insert'           │ 1000    │ 0.33016700000007404   │
-│ 8       │ 'Binary Search Tree' │ 'Search'           │ 1000    │ 0.043083000000024185  │
-│ 9       │ 'Binary Search Tree' │ 'Delete'           │ 1000    │ 0.03079200000001947   │
-│ 10      │ 'Red-Black Tree'     │ 'Insert'           │ 1000    │ 0.801834000000099     │
-│ 11      │ 'Red-Black Tree'     │ 'Search'           │ 1000    │ 0.020166000000017448  │
-│ 12      │ 'Red-Black Tree'     │ 'Delete'           │ 1000    │ 0.07908400000007987   │
-│ 13      │ 'AVL Tree'           │ 'Insert'           │ 1000    │ 0.6277499999999918    │
-│ 14      │ 'AVL Tree'           │ 'Search'           │ 1000    │ 0.011665999999991072  │
-│ 15      │ 'AVL Tree'           │ 'Delete'           │ 1000    │ 0.018916999999987638  │
-│ 16      │ 'Trie'               │ 'Insert'           │ 1000    │ 0.3450840000000426    │
-│ 17      │ 'Trie'               │ 'Search'           │ 1000    │ 0.01574999999991178   │
-│ 18      │ 'Trie'               │ 'Delete'           │ 1000    │ 0.01841699999999946   │
-│ 19      │ 'Min Heap'           │ 'Insert'           │ 1000    │ 0.18537499999990814   │
-│ 20      │ 'Min Heap'           │ 'Extract'          │ 1000    │ 0.32520899999997255   │
-│ 21      │ 'Max Heap'           │ 'Insert'           │ 1000    │ 0.18095899999991616   │
-│ 22      │ 'Max Heap'           │ 'Extract'          │ 1000    │ 0.3186670000000049    │
-│ 23      │ 'B-Tree'             │ 'Insert'           │ 1000    │ 0.47554200000001856   │
-│ 24      │ 'B-Tree'             │ 'Search'           │ 1000    │ 0.015457999999966887  │
-│ 25      │ 'B-Tree'             │ 'Delete'           │ 1000    │ 0.07829100000003564   │
-│ 26      │ 'Native Array'       │ 'Insert'           │ 10000   │ 0.19754100000000108   │
-│ 27      │ 'Native Array'       │ 'Search'           │ 10000   │ 0.0024580000000469227 │
-│ 28      │ 'Native Array'       │ 'Delete'           │ 10000   │ 0.0007079999999177744 │
-│ 29      │ 'Queue'              │ 'Insert (Enqueue)' │ 10000   │ 0.2820409999999356    │
-│ 30      │ 'Queue'              │ 'Delete (Dequeue)' │ 10000   │ 0.18724999999994907   │
-│ 31      │ 'Stack'              │ 'Insert (Push)'    │ 10000   │ 0.1817079999999578    │
-│ 32      │ 'Stack'              │ 'Delete (Pop)'     │ 10000   │ 0.16466700000000856   │
-│ 33      │ 'Binary Search Tree' │ 'Insert'           │ 10000   │ 1.6757920000000013    │
-│ 34      │ 'Binary Search Tree' │ 'Search'           │ 10000   │ 0.003916000000003805  │
-│ 35      │ 'Binary Search Tree' │ 'Delete'           │ 10000   │ 0.003582999999935055  │
-│ 36      │ 'Red-Black Tree'     │ 'Insert'           │ 10000   │ 3.0843340000000126    │
-│ 37      │ 'Red-Black Tree'     │ 'Search'           │ 10000   │ 0.005084000000010747  │
-│ 38      │ 'Red-Black Tree'     │ 'Delete'           │ 10000   │ 0.01779199999998582   │
-│ 39      │ 'AVL Tree'           │ 'Insert'           │ 10000   │ 1.7636669999999413    │
-│ 40      │ 'AVL Tree'           │ 'Search'           │ 10000   │ 0.0028340000000071086 │
-│ 41      │ 'AVL Tree'           │ 'Delete'           │ 10000   │ 0.004000000000019099  │
-│ 42      │ 'Trie'               │ 'Insert'           │ 10000   │ 1.201708999999937     │
-│ 43      │ 'Trie'               │ 'Search'           │ 10000   │ 0.005916999999953987  │
-│ 44      │ 'Trie'               │ 'Delete'           │ 10000   │ 0.004457999999999629  │
-│ 45      │ 'Min Heap'           │ 'Insert'           │ 10000   │ 0.45383399999991525   │
-│ 46      │ 'Min Heap'           │ 'Extract'          │ 10000   │ 0.8098329999999123    │
-│ 47      │ 'Max Heap'           │ 'Insert'           │ 10000   │ 0.3135409999999865    │
-│ 48      │ 'Max Heap'           │ 'Extract'          │ 10000   │ 0.7455420000000004    │
-│ 49      │ 'B-Tree'             │ 'Insert'           │ 10000   │ 2.5482500000000528    │
-│ 50      │ 'B-Tree'             │ 'Search'           │ 10000   │ 0.009791000000063832  │
-│ 51      │ 'B-Tree'             │ 'Delete'           │ 10000   │ 0.0771670000000313    │
-│ 52      │ 'Native Array'       │ 'Insert'           │ 100000  │ 0.13804100000004382   │
-│ 53      │ 'Native Array'       │ 'Search'           │ 100000  │ 0.016582999999968706  │
-│ 54      │ 'Native Array'       │ 'Delete'           │ 100000  │ 0.0009590000000798682 │
-│ 55      │ 'Queue'              │ 'Insert (Enqueue)' │ 100000  │ 1.9742090000000871    │
-│ 56      │ 'Queue'              │ 'Delete (Dequeue)' │ 100000  │ 0.3028749999999718    │
-│ 57      │ 'Stack'              │ 'Insert (Push)'    │ 100000  │ 0.7822499999999764    │
-│ 58      │ 'Stack'              │ 'Delete (Pop)'     │ 100000  │ 0.18483400000002348   │
-│ 59      │ 'Binary Search Tree' │ 'Insert'           │ 100000  │ 20.20908399999996     │
-│ 60      │ 'Binary Search Tree' │ 'Search'           │ 100000  │ 0.012583000000063294  │
-│ 61      │ 'Binary Search Tree' │ 'Delete'           │ 100000  │ 0.0031249999999545253 │
-│ 62      │ 'Red-Black Tree'     │ 'Insert'           │ 100000  │ 95.10391600000003     │
-│ 63      │ 'Red-Black Tree'     │ 'Search'           │ 100000  │ 0.01933299999996052   │
-│ 64      │ 'Red-Black Tree'     │ 'Delete'           │ 100000  │ 0.011167000000000371  │
-│ 65      │ 'AVL Tree'           │ 'Insert'           │ 100000  │ 29.13545899999997     │
-│ 66      │ 'AVL Tree'           │ 'Search'           │ 100000  │ 0.010999999999967258  │
-│ 67      │ 'AVL Tree'           │ 'Delete'           │ 100000  │ 0.003624999999942702  │
-│ 68      │ 'Trie'               │ 'Insert'           │ 100000  │ 33.300416999999925    │
-│ 69      │ 'Trie'               │ 'Search'           │ 100000  │ 0.045500000000060936  │
-│ 70      │ 'Trie'               │ 'Delete'           │ 100000  │ 0.08795800000007148   │
-│ 71      │ 'Min Heap'           │ 'Insert'           │ 100000  │ 4.6970830000000205    │
-│ 72      │ 'Min Heap'           │ 'Extract'          │ 100000  │ 9.893708999999944     │
-│ 73      │ 'Max Heap'           │ 'Insert'           │ 100000  │ 3.2794169999999667    │
-│ 74      │ 'Max Heap'           │ 'Extract'          │ 100000  │ 9.272040999999945     │
-│ 75      │ 'B-Tree'             │ 'Insert'           │ 100000  │ 50.47550000000001     │
-│ 76      │ 'B-Tree'             │ 'Search'           │ 100000  │ 0.012458000000037828  │
-│ 77      │ 'B-Tree'             │ 'Delete'           │ 100000  │ 0.0196250000000191    │
-│ 78      │ 'Native Array'       │ 'Insert'           │ 1000000 │ 2.0249169999999594    │
-│ 79      │ 'Native Array'       │ 'Search'           │ 1000000 │ 0.1390840000000253    │
-│ 80      │ 'Native Array'       │ 'Delete'           │ 1000000 │ 0.0008749999999508873 │
-│ 81      │ 'Queue'              │ 'Insert (Enqueue)' │ 1000000 │ 40.695625000000064    │
-│ 82      │ 'Queue'              │ 'Delete (Dequeue)' │ 1000000 │ 3.657124999999951     │
-│ 83      │ 'Stack'              │ 'Insert (Push)'    │ 1000000 │ 27.792416999999887    │
-│ 84      │ 'Stack'              │ 'Delete (Pop)'     │ 1000000 │ 3.720916999999872     │
-│ 85      │ 'Binary Search Tree' │ 'Insert'           │ 1000000 │ 354.1567090000001     │
-│ 86      │ 'Binary Search Tree' │ 'Search'           │ 1000000 │ 0.021709000000100787  │
-│ 87      │ 'Binary Search Tree' │ 'Delete'           │ 1000000 │ 0.0070420000001831795 │
-│ 88      │ 'Red-Black Tree'     │ 'Insert'           │ 1000000 │ 1473.951459           │
-│ 89      │ 'Red-Black Tree'     │ 'Search'           │ 1000000 │ 0.013708999999835214  │
-│ 90      │ 'Red-Black Tree'     │ 'Delete'           │ 1000000 │ 0.008624999999938154  │
-│ 91      │ 'AVL Tree'           │ 'Insert'           │ 1000000 │ 377.26012500000024    │
-│ 92      │ 'AVL Tree'           │ 'Search'           │ 1000000 │ 0.003666999999950349  │
-│ 93      │ 'AVL Tree'           │ 'Delete'           │ 1000000 │ 0.00233299999990777   │
-│ 94      │ 'Trie'               │ 'Insert'           │ 1000000 │ 465.33245799999986    │
-│ 95      │ 'Trie'               │ 'Search'           │ 1000000 │ 0.015583999999762455  │
-│ 96      │ 'Trie'               │ 'Delete'           │ 1000000 │ 0.01141700000016499   │
-│ 97      │ 'Min Heap'           │ 'Insert'           │ 1000000 │ 29.898666999999932    │
-│ 98      │ 'Min Heap'           │ 'Extract'          │ 1000000 │ 104.84195799999998    │
-│ 99      │ 'Max Heap'           │ 'Insert'           │ 1000000 │ 30.71804199999997     │
-│ 100     │ 'Max Heap'           │ 'Extract'          │ 1000000 │ 104.93929200000002    │
-│ 101     │ 'B-Tree'             │ 'Insert'           │ 1000000 │ 655.3055409999997     │
-│ 102     │ 'B-Tree'             │ 'Search'           │ 1000000 │ 0.009000000000014552  │
-│ 103     │ 'B-Tree'             │ 'Delete'           │ 1000000 │ 0.017625000000407454  │
-└─────────┴──────────────────────┴────────────────────┴─────────┴───────────────────────┘
+
+| (index) | dataStructure        | operation         | size    | time (ms)          |
+|---------|----------------------|-------------------|---------|--------------------|
+| 0       | Native Array         | Insert            | 1000    | 0.0042             |
+| 1       | Native Array         | Search            | 1000    | 0.0015             |
+| 2       | Native Array         | Delete            | 1000    | 0.0008             |
+| 3       | Queue                | Insert (Enqueue)  | 1000    | 0.1306             |
+| 4       | Queue                | Delete (Dequeue)  | 1000    | 0.1355             |
+| 5       | Stack                | Insert (Push)     | 1000    | 0.1216             |
+| 6       | Stack                | Delete (Pop)      | 1000    | 0.1128             |
+| 7       | Binary Search Tree   | Insert            | 1000    | 0.3302             |
+| 8       | Binary Search Tree   | Search            | 1000    | 0.0431             |
+| 9       | Binary Search Tree   | Delete            | 1000    | 0.0308             |
+| 10      | Red-Black Tree       | Insert            | 1000    | 0.8018             |
+| 11      | Red-Black Tree       | Search            | 1000    | 0.0202             |
+| 12      | Red-Black Tree       | Delete            | 1000    | 0.0791             |
+| 13      | AVL Tree             | Insert            | 1000    | 0.6278             |
+| 14      | AVL Tree             | Search            | 1000    | 0.0117             |
+| 15      | AVL Tree             | Delete            | 1000    | 0.0189             |
+| 16      | Trie                 | Insert            | 1000    | 0.3451             |
+| 17      | Trie                 | Search            | 1000    | 0.0157             |
+| 18      | Trie                 | Delete            | 1000    | 0.0184             |
+| 19      | Min Heap             | Insert            | 1000    | 0.1854             |
+| 20      | Min Heap             | Extract           | 1000    | 0.3252             |
+| 21      | Max Heap             | Insert            | 1000    | 0.1810             |
+| 22      | Max Heap             | Extract           | 1000    | 0.3187             |
+| 23      | B-Tree               | Insert            | 1000    | 0.4755             |
+| 24      | B-Tree               | Search            | 1000    | 0.0155             |
+| 25      | B-Tree               | Delete            | 1000    | 0.0783             |
+| 26      | Native Array         | Insert            | 10000   | 0.1975             |
+| 27      | Native Array         | Search            | 10000   | 0.0025             |
+| 28      | Native Array         | Delete            | 10000   | 0.0007             |
+| 29      | Queue                | Insert (Enqueue)  | 10000   | 0.2820             |
+| 30      | Queue                | Delete (Dequeue)  | 10000   | 0.1872             |
+| 31      | Stack                | Insert (Push)     | 10000   | 0.1817             |
+| 32      | Stack                | Delete (Pop)      | 10000   | 0.1647             |
+| 33      | Binary Search Tree   | Insert            | 10000   | 1.6758             |
+| 34      | Binary Search Tree   | Search            | 10000   | 0.0039             |
+| 35      | Binary Search Tree   | Delete            | 10000   | 0.0036             |
+| 36      | Red-Black Tree       | Insert            | 10000   | 3.0843             |
+| 37      | Red-Black Tree       | Search            | 10000   | 0.0051             |
+| 38      | Red-Black Tree       | Delete            | 10000   | 0.0178             |
+| 39      | AVL Tree             | Insert            | 10000   | 1.7637             |
+| 40      | AVL Tree             | Search            | 10000   | 0.0028             |
+| 41      | AVL Tree             | Delete            | 10000   | 0.0040             |
+| 42      | Trie                 | Insert            | 10000   | 1.2017             |
+| 43      | Trie                 | Search            | 10000   | 0.0059             |
+| 44      | Trie                 | Delete            | 10000   | 0.0045             |
+| 45      | Min Heap             | Insert            | 10000   | 0.4538             |
+| 46      | Min Heap             | Extract           | 10000   | 0.8098             |
+| 47      | Max Heap             | Insert            | 10000   | 0.3135             |
+| 48      | Max Heap             | Extract           | 10000   | 0.7455             |
+| 49      | B-Tree               | Insert            | 10000   | 2.5483             |
+| 50      | B-Tree               | Search            | 10000   | 0.0098             |
+| 51      | B-Tree               | Delete            | 10000   | 0.0772             |
+| 52      | Native Array         | Insert            | 100000  | 0.1380             |
+| 53      | Native Array         | Search            | 100000  | 0.0166             |
+| 54      | Native Array         | Delete            | 100000  | 0.0010             |
+| 55      | Queue                | Insert (Enqueue)  | 100000  | 1.9742             |
+| 56      | Queue                | Delete (Dequeue)  | 100000  | 0.3029             |
+| 57      | Stack                | Insert (Push)     | 100000  | 0.7822             |
+| 58      | Stack                | Delete (Pop)      | 100000  | 0.1848             |
+| 59      | Binary Search Tree   | Insert            | 100000  | 20.2091            |
+| 60      | Binary Search Tree   | Search            | 100000  | 0.0126             |
+| 61      | Binary Search Tree   | Delete            | 100000  | 0.0031             |
+| 62      | Red-Black Tree       | Insert            | 100000  | 95.1039            |
+| 63      | Red-Black Tree       | Search            | 100000  | 0.0193             |
+| 64      | Red-Black Tree       | Delete            | 100000  | 0.0112             |
+| 65      | AVL Tree             | Insert            | 100000  | 29.1355            |
+| 66      | AVL Tree             | Search            | 100000  | 0.0110             |
+| 67      | AVL Tree             | Delete            | 100000  | 0.0036             |
+| 68      | Trie                 | Insert            | 100000  | 33.3004            |
+| 69      | Trie                 | Search            | 100000  | 0.0455             |
+| 70      | Trie                 | Delete            | 100000  | 0.0880             |
+| 71      | Min Heap             | Insert            | 100000  | 4.6971             |
+| 72      | Min Heap             | Extract           | 100000  | 9.8937             |
+| 73      | Max Heap             | Insert            | 100000  | 3.2794             |
+| 74      | Max Heap             | Extract           | 100000  | 9.2720             |
+| 75      | B-Tree               | Insert            | 100000  | 50.4755            |
+| 76      | B-Tree               | Search            | 100000  | 0.0125             |
+| 77      | B-Tree               | Delete            | 100000  | 0.0196             |
+| 78      | Native Array         | Insert            | 1000000 | 2.0249             |
+| 79      | Native Array         | Search            | 1000000 | 0.1391             |
+| 80      | Native Array         | Delete            | 1000000 | 0.000              |
 
 **Suggested Applications:**
 - Small Data: For datasets around 1,000 elements, Native Arrays, Queues, and Stacks provide excellent performance.
@@ -134,46 +110,44 @@ A powerful toolkit for data structures and algorithms in TypeScript, designed fo
 
 ### Algorithms Benchmarks
 
-┌─────────┬──────────────────────┬───────────┬─────────┬───────────────────────┐
-│ (index) │ algorithm            │ operation │ size    │ time (ms)             │
-├─────────┼──────────────────────┼───────────┼─────────┼───────────────────────┤
-│ 0       │ 'Heap Sort'          │ 'Sort'    │ 1000    │ 1.1343749999999773    │
-│ 1       │ 'Merge Sort'         │ 'Sort'    │ 1000    │ 0.6769580000000133    │
-│ 2       │ 'Tim Sort'           │ 'Sort'    │ 1000    │ 0.5847079999999778    │
-│ 3       │ 'Native Sort'        │ 'Sort'    │ 1000    │ 0.14208299999995688   │
-│ 4       │ 'Binary Search'      │ 'Search'  │ 1000    │ 0.027791999999976724  │
-│ 5       │ 'Exponential Search' │ 'Search'  │ 1000    │ 0.02650000000005548   │
-│ 6       │ 'Hybrid Search'      │ 'Search'  │ 1000    │ 0.03766700000005585   │
-│ 7       │ 'Linear Search'      │ 'Search'  │ 1000    │ 0.02174999999999727   │
-│ 8       │ 'Ternary Search'     │ 'Search'  │ 1000    │ 0.025875000000041837  │
-│ 9       │ 'Heap Sort'          │ 'Sort'    │ 10000   │ 2.6921250000000327    │
-│ 10      │ 'Merge Sort'         │ 'Sort'    │ 10000   │ 3.4184999999999945    │
-│ 11      │ 'Tim Sort'           │ 'Sort'    │ 10000   │ 2.1582500000000664    │
-│ 12      │ 'Native Sort'        │ 'Sort'    │ 10000   │ 1.2180829999999787    │
-│ 13      │ 'Binary Search'      │ 'Search'  │ 10000   │ 0.0049999999999954525 │
-│ 14      │ 'Exponential Search' │ 'Search'  │ 10000   │ 0.006209000000012566  │
-│ 15      │ 'Hybrid Search'      │ 'Search'  │ 10000   │ 3.510458999999969     │
-│ 16      │ 'Linear Search'      │ 'Search'  │ 10000   │ 0.0740409999999656    │
-│ 17      │ 'Ternary Search'     │ 'Search'  │ 10000   │ 0.00666599999999562   │
-│ 18      │ 'Heap Sort'          │ 'Sort'    │ 100000  │ 18.31458400000008     │
-│ 19      │ 'Merge Sort'         │ 'Sort'    │ 100000  │ 24.663625000000025    │
-│ 20      │ 'Tim Sort'           │ 'Sort'    │ 100000  │ 12.391457999999943    │
-│ 21      │ 'Native Sort'        │ 'Sort'    │ 100000  │ 15.627165999999988    │
-│ 22      │ 'Binary Search'      │ 'Search'  │ 100000  │ 0.01999999999998181   │
-│ 23      │ 'Exponential Search' │ 'Search'  │ 100000  │ 0.1084170000000313    │
-│ 24      │ 'Hybrid Search'      │ 'Search'  │ 100000  │ 30.412333000000103    │
-│ 25      │ 'Linear Search'      │ 'Search'  │ 100000  │ 0.6435000000000173    │
-│ 26      │ 'Ternary Search'     │ 'Search'  │ 100000  │ 0.010750000000030013  │
-│ 27      │ 'Heap Sort'          │ 'Sort'    │ 1000000 │ 272.6623330000001     │
-│ 28      │ 'Merge Sort'         │ 'Sort'    │ 1000000 │ 246.91945899999996    │
-│ 29      │ 'Tim Sort'           │ 'Sort'    │ 1000000 │ 140.54433300000005    │
-│ 30      │ 'Native Sort'        │ 'Sort'    │ 1000000 │ 184.8578329999998     │
-│ 31      │ 'Binary Search'      │ 'Search'  │ 1000000 │ 0.027083999999831576  │
-│ 32      │ 'Exponential Search' │ 'Search'  │ 1000000 │ 0.7834170000000995    │
-│ 33      │ 'Hybrid Search'      │ 'Search'  │ 1000000 │ 375.9163330000001     │
-│ 34      │ 'Linear Search'      │ 'Search'  │ 1000000 │ 0.6445420000000013    │
-│ 35      │ 'Ternary Search'     │ 'Search'  │ 1000000 │ 0.00937500000009095   │
-└─────────┴──────────────────────┴───────────┴─────────┴───────────────────────┘
+| (index) | algorithm            | operation | size     | time (ms)     |
+|---------|----------------------|-----------|----------|---------------|
+| 0       | Heap Sort            | Sort      | 1000     | 1.1344        |
+| 1       | Merge Sort           | Sort      | 1000     | 0.6770        |
+| 2       | Tim Sort             | Sort      | 1000     | 0.5847        |
+| 3       | Native Sort          | Sort      | 1000     | 0.1421        |
+| 4       | Binary Search        | Search    | 1000     | 0.0278        |
+| 5       | Exponential Search   | Search    | 1000     | 0.0265        |
+| 6       | Hybrid Search        | Search    | 1000     | 0.0377        |
+| 7       | Linear Search        | Search    | 1000     | 0.0218        |
+| 8       | Ternary Search       | Search    | 1000     | 0.0259        |
+| 9       | Heap Sort            | Sort      | 10000    | 2.6921        |
+| 10      | Merge Sort           | Sort      | 10000    | 3.4185        |
+| 11      | Tim Sort             | Sort      | 10000    | 2.1583        |
+| 12      | Native Sort          | Sort      | 10000    | 1.2181        |
+| 13      | Binary Search        | Search    | 10000    | 0.0050        |
+| 14      | Exponential Search   | Search    | 10000    | 0.0062        |
+| 15      | Hybrid Search        | Search    | 10000    | 3.5105        |
+| 16      | Linear Search        | Search    | 10000    | 0.0740        |
+| 17      | Ternary Search       | Search    | 10000    | 0.0067        |
+| 18      | Heap Sort            | Sort      | 100000   | 18.3146       |
+| 19      | Merge Sort           | Sort      | 100000   | 24.6636       |
+| 20      | Tim Sort             | Sort      | 100000   | 12.3915       |
+| 21      | Native Sort          | Sort      | 100000   | 15.6272       |
+| 22      | Binary Search        | Search    | 100000   | 0.0200        |
+| 23      | Exponential Search   | Search    | 100000   | 0.1084        |
+| 24      | Hybrid Search        | Search    | 100000   | 30.4123       |
+| 25      | Linear Search        | Search    | 100000   | 0.6435        |
+| 26      | Ternary Search       | Search    | 100000   | 0.0108        |
+| 27      | Heap Sort            | Sort      | 1000000  | 272.6623      |
+| 28      | Merge Sort           | Sort      | 1000000  | 246.9195      |
+| 29      | Tim Sort             | Sort      | 1000000  | 140.5443      |
+| 30      | Native Sort          | Sort      | 1000000  | 184.8578      |
+| 31      | Binary Search        | Search    | 1000000  | 0.0271        |
+| 32      | Exponential Search   | Search    | 1000000  | 0.7834        |
+| 33      | Hybrid Search        | Search    | 1000000  | 375.9163      |
+| 34      | Linear Search        | Search    | 1000000  | 0.6445        |
+| 35      | Ternary Search       | Search    | 1000000  | 0.0094        |
 
 **Sorting Algorithms:**
 - Heap Sort: Ideal for priority queues and constrained memory environments.
@@ -187,37 +161,6 @@ A powerful toolkit for data structures and algorithms in TypeScript, designed fo
 - Hybrid Search: Adapts well to changing dataset sizes, ideal for large applications and databases.
 - Linear Search: Suited for small, unsorted datasets where search is infrequent.
 - Ternary Search: Good for distinct, ordered data ranges, often in optimization or game algorithms.
-
-## 🚀 Getting Started
-
-### Prerequisites
-Make sure you have [pnpm](https://pnpm.io/) installed as it’s used for package management in this project.
-
-### Installation
-
-To install the DSA Toolbox, clone the repository and install dependencies with pnpm:
-
-```bash
-# Clone the repository
-git clone https://github.com/helabenkhalfallah/dsa-toolbox.git
-
-# Navigate into the project directory
-cd dsa-toolbox
-
-# Install dependencies
-pnpm install
-```
-
-### Scripts
-
-- **Build**: `pnpm build:tsc` - Compiles TypeScript files to JavaScript.
-- **Development**: `pnpm start:dev` - Runs the project in development mode with auto-reloading.
-- **Linting**: `pnpm lint` - Checks code for linting errors.
-- **Lint Fix**: `pnpm lint:fix` - Fixes linting issues automatically.
-- **Format**: `pnpm format` - Formats code using Prettier.
-- **Testing**: `pnpm test` - Runs the test suite.
-- **Test Watch**: `pnpm test:watch` - Runs tests in watch mode.
-- **Test UI**: `pnpm test:ui` - Opens the test UI.
 
 ## 🛠️ Usage
 
@@ -272,6 +215,38 @@ maxHeap.insert(5);
 console.log(`Max element: ${maxHeap.extractMax()}`);
 ```
 
+## 🚀 Contributing
+
+### Prerequisites
+Make sure you have [pnpm](https://pnpm.io/) installed as it’s used for package management in this project.
+
+### Installation
+
+To install the DSA Toolbox, clone the repository and install dependencies with pnpm:
+
+```bash
+# Clone the repository
+git clone https://github.com/helabenkhalfallah/dsa-toolbox.git
+
+# Navigate into the project directory
+cd dsa-toolbox
+
+# Install dependencies
+pnpm install
+```
+
+### Scripts
+
+- **Build**: `pnpm build:tsc` - Compiles TypeScript files to JavaScript.
+- **Development**: `pnpm start:dev` - Runs the project in development mode with auto-reloading.
+- **Linting**: `pnpm lint` - Checks code for linting errors.
+- **Lint Fix**: `pnpm lint:fix` - Fixes linting issues automatically.
+- **Format**: `pnpm format` - Formats code using Prettier.
+- **Testing**: `pnpm test` - Runs the test suite.
+- **Test Watch**: `pnpm test:watch` - Runs tests in watch mode.
+- **Test UI**: `pnpm test:ui` - Opens the test UI.
+
+
 ## 📚 Documentation & References
 
 For detailed explanations of each data structure and algorithm, please visit:
@@ -283,5 +258,61 @@ For detailed explanations of each data structure and algorithm, please visit:
 - [Probabilistic Data Structures for Large Data Challenges](https://helabenkhalfallah.com/2024/11/03/probabilistic-data-structures-for-large-data-challenges/)
 
 ---
+
+## Code coverage
+
+| File                                       | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                                                          |
+|--------------------------------------------|---------|----------|---------|---------|--------------------------------------------------------------------------------------------|
+| All files                                  | 90.84   | 90.44    | 96.34   | 90.84   |                                                                                            |
+| algorithms/search                          | 96.9    | 92.85    | 100     | 96.9    |                                                                                            |
+| BinarySearch.ts                            | 100     | 100      | 100     | 100     |                                                                                            |
+| ExponentialSearch.ts                       | 100     | 87.5     | 100     | 100     | 70                                                                                         |
+| HybridSearch.ts                            | 93.33   | 87.5     | 100     | 93.33   | 121-122                                                                                    |
+| LinearSearch.ts                            | 100     | 100      | 100     | 100     |                                                                                            |
+| TernarySearch.ts                           | 96      | 92.3     | 100     | 96      | 82                                                                                         |
+| algorithms/sort                            | 99.44   | 95.23    | 100     | 99.44   |                                                                                            |
+| HeapSort.ts                                | 100     | 100      | 100     | 100     |                                                                                            |
+| MergeSort.ts                               | 100     | 100      | 100     | 100     |                                                                                            |
+| TimSort.ts                                 | 99.24   | 93.47    | 100     | 99.24   | 128                                                                                        |
+| commons                                    | 85.71   | 100      | 75      | 85.71   |                                                                                            |
+| ComparableNode.ts                          | 85.71   | 100      | 75      | 85.71   | 50-51                                                                                      |
+| data-structures/cache                      | 100     | 94.59    | 100     | 100     |                                                                                            |
+| LFU.ts                                     | 100     | 90.9     | 100     | 100     | 75,148                                                                                     |
+| LRU.ts                                     | 100     | 100      | 100     | 100     |                                                                                            |
+| data-structures/heaps                      | 97.14   | 93.87    | 88.88   | 97.14   |                                                                                            |
+| MaxHeap.ts                                 | 97.14   | 96       | 88.88   | 97.14   | 138-139                                                                                    |
+| MinHeap.ts                                 | 97.14   | 91.66    | 88.88   | 97.14   | 139-140                                                                                    |
+| data-structures/linked-list                | 97.04   | 89.06    | 100     | 97.04   |                                                                                            |
+| DoublyLinkedList.ts                        | 95.65   | 88.57    | 100     | 95.65   | 87-89,91                                                                                   |
+| LinkedList.ts                              | 98.7    | 89.65    | 100     | 98.7    | 75                                                                                         |
+| data-structures/probabilistic/cardinality  | 84.61   | 87.5     | 87.5    | 84.61   |                                                                                            |
+| HyperLogLog.ts                             | 84.61   | 87.5     | 87.5    | 84.61   | 61-63,75-81                                                                                |
+| data-structures/probabilistic/frequency    | 100     | 100      | 100     | 100     |                                                                                            |
+| CountMinSketch.ts                          | 100     | 100      | 100     | 100     |                                                                                            |
+| data-structures/probabilistic/membership   | 100     | 100      | 100     | 100     |                                                                                            |
+| BloomFilter.ts                             | 100     | 100      | 100     | 100     |                                                                                            |
+| data-structures/probabilistic/ordered      | 97.87   | 97.22    | 100     | 97.87   |                                                                                            |
+| SkipList.ts                                | 97.87   | 97.22    | 100     | 97.87   | 102-103                                                                                    |
+| data-structures/probabilistic/quantile     | 97.97   | 91.42    | 100     | 97.97   |                                                                                            |
+| TDigest.ts                                 | 97.97   | 91.42    | 100     | 97.97   | 61,85                                                                                      |
+| data-structures/probabilistic/similarity   | 100     | 100      | 100     | 100     |                                                                                            |
+| MinHash.ts                                 | 100     | 100      | 100     | 100     |                                                                                            |
+| SimHash.ts                                 | 100     | 100      | 100     | 100     |                                                                                            |
+| data-structures/queue                      | 100     | 100      | 100     | 100     |                                                                                            |
+| Queue.ts                                   | 100     | 100      | 100     | 100     |                                                                                            |
+| data-structures/stack                      | 100     | 100      | 100     | 100     |                                                                                            |
+| Stack.ts                                   | 100     | 100      | 100     | 100     |                                                                                            |
+| data-structures/treaps                     | 82.41   | 88.88    | 92.85   | 82.41   |                                                                                            |
+| Treap.ts                                   | 82.41   | 88.88    | 92.85   | 82.41   | 84-85,111-115,163,168-176                                                                  |
+| data-structures/trees/avl                  | 90.62   | 84.31    | 100     | 90.62   |                                                                                            |
+| AVLTree.ts                                 | 90.62   | 84.31    | 100     | 90.62   | 118-119,169,196-198,201-203                                                                |
+| data-structures/trees/b-tree               | 68.71   | 75       | 76.47   | 68.71   |                                                                                            |
+| BTree.ts                                   | 68.71   | 75       | 76.47   | 68.71   | 67,114-115,119-120,146-147,169-171,182-192,203-208,220-221,232-243,252-261,270-279,294-295 |
+| data-structures/trees/bst                  | 93.4    | 93.61    | 100     | 93.4    |                                                                                            |
+| BinarySearchTree.ts                        | 93.4    | 93.61    | 100     | 93.4    | 132-134,137-139                                                                            |
+| data-structures/trees/red-black            | 76.07   | 81.81    | 100     | 76.07   |                                                                                            |
+| RedBlackTree.ts                            | 76.07   | 81.81    | 100     | 76.07   | 107-114,274,278-279,318-344,347-373,379,395-396,398-399,442-443                            |
+| data-structures/trees/trie                 | 100     | 96       | 100     | 100     |                                                                                            |
+| Trie.ts                                    | 100     | 96       | 100     | 100     | 89                                                                                         |
 
 Happy coding with the DSA Toolbox! 🎉

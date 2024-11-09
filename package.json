@@ -1,6 +1,6 @@
 {
   "name": "dsa-toolbox",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A powerful toolkit for data structures and algorithms in TypeScript, designed for optimal performance and versatility. The toolkit provides implementations of various data structures and algorithms, with a focus on search and sort operations, caching, and probabilistic data structures.",
   "type": "module",
   "main": "dist/index.js",
@@ -10,6 +10,7 @@
     "README.md"
   ],
   "scripts": {
+    "update-docs": "rimraf ./docs && typedoc",
     "build": "rimraf ./dist && tsc",
     "bench-ds": "nodemon --exec node --loader ts-node/esm ./benchmark-ds.ts -- --dev",
     "bench-algo": "nodemon --exec node --loader ts-node/esm ./benchmark-algo.ts -- --dev",
@@ -19,7 +20,6 @@
     "test": "vitest --coverage --watch false",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "update-docs": "rimraf ./docs && typedoc",
     "prepare": "husky"
   },
   "keywords": [],
