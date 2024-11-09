@@ -7,7 +7,6 @@ export default [
     ...tsEslint.configs.recommended,
     {
         files: ['src/**/*.js', 'src/**/*.mjs', 'src/**/*.tsx', 'src/**/*.ts'],
-        ignores: ['**/*.test.js', '*.d.ts'],
         rules: {
             'max-depth': ['error', 5],
             'max-nested-callbacks': ['error', 5],
@@ -16,6 +15,9 @@ export default [
             'max-lines-per-function': ['error', 200], // per function
             'max-statements': ['error', 50], // per function
         },
+    },
+    {
+        ignores: ['**/*.test.js', '*.d.ts', 'dist/**/*.ts'],
     },
     eslintPluginPrettierRecommended,
 ];

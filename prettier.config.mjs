@@ -1,6 +1,5 @@
 import PrettierImportConfig from '@trivago/prettier-plugin-sort-imports';
 
-
 /**
  * @see https://prettier.io/docs/en/configuration.html
  * @type {import("prettier").Config}
