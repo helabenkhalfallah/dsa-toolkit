@@ -1,12 +1,12 @@
 {
   "name": "dsa-toolbox",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "/dist",
+    "dist",
     "README.md"
   ],
   "scripts": {
