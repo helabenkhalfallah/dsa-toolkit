@@ -1,18 +1,39 @@
 
 # DSA Toolbox 📚
 
-A powerful toolkit for data structures and algorithms in TypeScript, designed for optimal performance and versatility. The toolkit provides implementations of various data structures and algorithms, with a focus on search and sort operations, caching, and probabilistic data structures.
+Welcome to **DSA Toolbox**, a comprehensive library of **data structures** and **algorithms** designed to streamline your development process! This library is built for **JavaScript** and **TypeScript**, offering both fundamental and advanced data structures, search algorithms, sort algorithms, and more.
+
+Whether you're building a lightweight application or handling large datasets, **DSA Toolbox** provides an optimized library to make your coding journey efficient and fun.
 
 ## ✨ Features
 
-- **Search Algorithms**: Binary, Exponential, Hybrid, Linear, and Ternary Search.
-- **Sorting Algorithms**: Heap Sort, Merge Sort, and TimSort.
-- **Caches**: LRU and LFU cache implementations.
-- **Heaps**: Min and Max Heap.
-- **Linked Lists**: Singly and Doubly Linked Lists.
-- **Probabilistic Data Structures**: HyperLogLog, Count-Min Sketch, Bloom Filter, Skip List, t-Digest, MinHash, and SimHash.
-- **Trees**: AVL Tree, B-Tree, Binary Search Tree, Red-Black Tree, and Trie.
-- **Additional Structures**: Queue, Stack, and Treap.
+**DSA Toolbox** offers a variety of powerful toolbox:
+
+### 🔎 **Search Algorithms**
+- Binary Search
+- Exponential Search
+- Hybrid Search
+- Linear Search
+- Ternary Search
+
+### 🧮 **Sort Algorithms**
+- HeapSort
+- MergeSort
+- TimSort
+
+### 🔄 **Cache Algorithms**
+- LFU (Least Frequently Used)
+- LRU (Least Recently Used)
+
+### 🏗️ **Data Structures**
+- **Heaps**: MaxHeap, MinHeap
+- **Linked Lists**: Singly Linked List, Doubly Linked List
+- **Queues & Stacks**
+- **Treaps** (Binary Search Tree with heap properties)
+- **Trees**: AVL Tree, Red-Black Tree, Binary Search Tree, B-Tree, Trie
+- **Probabilistic Structures**: Bloom Filter, HyperLogLog, CountMinSketch, SkipList, MinHash, SimHash, TDigest
+
+---
 
 ## Benchmarks
 
@@ -162,6 +183,8 @@ A powerful toolkit for data structures and algorithms in TypeScript, designed fo
 - Linear Search: Suited for small, unsorted datasets where search is infrequent.
 - Ternary Search: Good for distinct, ordered data ranges, often in optimization or game algorithms.
 
+---
+
 ## 🛠️ Usage
 
 To install the DSA Toolbox:
@@ -204,48 +227,32 @@ import {
   Trie,
 } from 'dsa-toolbox';
 
-// Example: Using binary search
-const index = binarySearch([1, 2, 3, 4, 5], 3, (a, b) => a - b);
-console.log(`Element found at index: ${index}`);
+binarySearch(sortedData, target, { compareFn: (a, b) => a - b, isSorted: true });
+ternarySearch(data, target, 0, sortedData.length - 1, {
+        compareFn: (a, b) => a - b,
+        isSorted: false,
+    });
 
-// Example: Initializing a MaxHeap
-const maxHeap = new MaxHeap<number>();
-maxHeap.insert(10);
-maxHeap.insert(5);
-console.log(`Max element: ${maxHeap.extractMax()}`);
+const queue = new Queue<number>();
+data.forEach((item) => queue.enqueue(item));
+
+const avlTree = new AVLTree<number>();
+avlTree.insert(10);
+avlTree.insert(20);
+avlTree.insert(5);
+avlTree.insert(4);
+avlTree.insert(15);
+avlTree.search(10);
 ```
 
-## 🚀 Contributing
+More usage examples can be found here:
+- https://github.com/helabenkhalfallah/dsa-toolbox/blob/main/benchmark-algo.ts
+- https://github.com/helabenkhalfallah/dsa-toolbox/blob/main/benchmark-ds.ts
+- In tests files, for example:
+  - https://github.com/helabenkhalfallah/dsa-toolbox/blob/main/src/data-structures/trees/avl/AVLTree-test.ts
+  - https://github.com/helabenkhalfallah/dsa-toolbox/blob/main/src/data-structures/trees/b-tree/BTree-test.ts
 
-### Prerequisites
-Make sure you have [pnpm](https://pnpm.io/) installed as it’s used for package management in this project.
-
-### Installation
-
-To install the DSA Toolbox, clone the repository and install dependencies with pnpm:
-
-```bash
-# Clone the repository
-git clone https://github.com/helabenkhalfallah/dsa-toolbox.git
-
-# Navigate into the project directory
-cd dsa-toolbox
-
-# Install dependencies
-pnpm install
-```
-
-### Scripts
-
-- **Build**: `pnpm build:tsc` - Compiles TypeScript files to JavaScript.
-- **Development**: `pnpm start:dev` - Runs the project in development mode with auto-reloading.
-- **Linting**: `pnpm lint` - Checks code for linting errors.
-- **Lint Fix**: `pnpm lint:fix` - Fixes linting issues automatically.
-- **Format**: `pnpm format` - Formats code using Prettier.
-- **Testing**: `pnpm test` - Runs the test suite.
-- **Test Watch**: `pnpm test:watch` - Runs tests in watch mode.
-- **Test UI**: `pnpm test:ui` - Opens the test UI.
-
+---
 
 ## 📚 Documentation & References
 
@@ -314,5 +321,13 @@ For detailed explanations of each data structure and algorithm, please visit:
 | RedBlackTree.ts                            | 76.07   | 81.81    | 100     | 76.07   | 107-114,274,278-279,318-344,347-373,379,395-396,398-399,442-443                            |
 | data-structures/trees/trie                 | 100     | 96       | 100     | 100     |                                                                                            |
 | Trie.ts                                    | 100     | 96       | 100     | 100     | 89                                                                                         |
+
+---
+
+## 🚀 Contributing
+
+For contributions, we invite you to read our [Contributing Guide](https://github.com/helabenkhalfallah/dsa-toolbox/wiki/Contributing-to-DSA-Toolbox) to get started and ensure a smooth process.
+
+---
 
 Happy coding with the DSA Toolbox! 🎉
