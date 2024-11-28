@@ -26,6 +26,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "graphology": "=0.25.4",
+    "graphology-communities-louvain": "=2.0.1",
+    "graphology-metrics": "=2.3.1"
+  },
   "devDependencies": {
     "@eslint/js": "=9.11.1",
     "@trivago/prettier-plugin-sort-imports": "=4.3.0",
@@ -37,6 +42,7 @@
     "eslint": "=9.0.0",
     "eslint-config-prettier": "=9.1.0",
     "eslint-plugin-prettier": "=5.2.1",
+    "graphology-types": "=0.24.8",
     "husky": "=9.1.6",
     "nodemon": "=2.0.19",
     "rimraf": "=6.0.1",

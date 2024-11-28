@@ -128,6 +128,15 @@ export class AdjacencyMatrix<T, E> {
     }
 
     /**
+     * Returns all the vertices in the graph.
+     *
+     * @returns {T[]} - An array of all vertices in the graph.
+     */
+    getVertices(): T[] {
+        return [...this.vertices];
+    }
+
+    /**
      * Prints the entire graph, showing each vertex and its associated neighbors and edge data.
      */
     printGraph(): void {

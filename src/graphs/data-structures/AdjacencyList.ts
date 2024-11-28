@@ -128,6 +128,76 @@ export class AdjacencyList<T, E> {
     }
 
     /**
+     * Returns all the vertices in the graph.
+     *
+     * @returns {T[]} - An array of all vertices in the graph.
+     */
+    getVertices(): T[] {
+        return Array.from(this.adjList.keys());
+    }
+
+    /**
+     * Returns all edges in the graph as an array of [source, target] pairs.
+     *
+     * @returns {Array<[T, T]>} - An array of edges.
+     */
+    getEdges(): Array<[T, T]> {
+        const edges: Array<[T, T]> = [];
+        this.adjList.forEach((data, vertex) => {
+            data.neighbors.forEach((neighbor) => {
+                edges.push([vertex, neighbor]);
+            });
+        });
+        return edges;
+    }
+
+    /**
+     * Returns the total number of vertices in the graph.
+     *
+     * @returns {number} - The number of vertices in the graph.
+     */
+    getTotalEdgeWeight(): number {
+        const processedEdges = new Set<string>();
+        let totalWeight = 0;
+
+        this.adjList.forEach((data, source) => {
+            data.neighbors.forEach((neighbor) => {
+                const edgeKey =
+                    source < neighbor ? `${source}-${neighbor}` : `${neighbor}-${source}`;
+                if (!processedEdges.has(edgeKey)) {
+                    processedEdges.add(edgeKey);
+                    totalWeight += (this.getEdgeData(source, neighbor) as unknown as number) ?? 0;
+                }
+            });
+        });
+
+        return totalWeight;
+    }
+
+    /**
+     * Returns the degree of a vertex in the graph.
+     * @param vertex
+     */
+    getNodeDegree(vertex: T): number {
+        const data = this.adjList.get(vertex);
+        return data
+            ? Array.from(data.edgeData.values()).reduce((a, b) => a + (b as unknown as number), 0)
+            : 0;
+    }
+
+    /**
+     * Checks if an edge exists between two vertices.
+     *
+     * @param {T} vertex1 - The first vertex.
+     * @param {T} vertex2 - The second vertex.
+     * @returns {boolean} - True if the edge exists, false otherwise.
+     */
+    hasEdge(vertex1: T, vertex2: T): boolean {
+        const vertex1Data = this.adjList.get(vertex1);
+        return vertex1Data?.edgeData.has(vertex2) || false;
+    }
+
+    /**
      * Prints the entire graph, showing each vertex and its associated neighbors and edge data.
      */
     printGraph(): void {
