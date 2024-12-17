@@ -1,230 +1,165 @@
 /**
- * A class representing a graph using the adjacency list representation.
- *
- * The adjacency list is a collection of nodes where each node stores a list of its neighbors.
- * It is a space-efficient way to store graphs, especially sparse graphs, where the number of edges is much smaller than the number of vertices.
- *
- * When to Use Adjacency List:
- * - Sparse graphs: When you have many vertices but relatively few edges.
- * - Dynamic graphs: Where you may frequently add/remove vertices and edges.
- * - Frequent neighbor queries: If you need to often query which vertices are connected to a given vertex.
- *
- * When Not to Use Adjacency List:
- * - Dense graphs: When there are many edges, Adjacency Matrices may be more efficient because they allow for constant-time edge lookups.
- * - Edge existence queries: If you often need to check whether an edge exists between two vertices without needing to traverse neighbors, an Adjacency Matrix might be more efficient.
- *
- * **Complexity:**
- * - **Space Complexity:** O(V + E), where V is the number of vertices and E is the number of edges. Each vertex is stored with its list of neighbors.
- * - **Time Complexity:**
- *   - `addVertex()`: O(1) – Adding a vertex to the graph is a constant-time operation.
- *   - `addEdge()`: O(1) – Adding an edge is also a constant-time operation.
- *   - `removeVertex()`: O(V + E) – In the worst case, removing a vertex may involve checking all edges in the graph.
- *   - `removeEdge()`: O(E) – In the worst case, removing an edge requires scanning the list of neighbors.
- *   - `getNeighbors()`: O(1) – Accessing the neighbors of a vertex is a constant-time operation.
- *   - `printGraph()`: O(V + E) – Printing the entire graph requires traversing all vertices and their neighbors.
+ * Represents an edge in the adjacency list.
+ * @template T - The type of the node.
  */
-export class AdjacencyList<T, E> {
-    private adjList: Map<T, { neighbors: T[]; edgeData: Map<T, E> }>;
+type Edge<T> = {
+    /** The target node of the edge. */
+    node: T;
+    /** The weight of the edge (optional). */
+    weight?: number;
+};
 
-    constructor() {
-        // Initialize an empty adjacency list using a Map
-        this.adjList = new Map();
+/**
+ * A functional-style Adjacency List for representing graphs.
+ * Provides immutable operations for graph construction and manipulation.
+ * @template T - The type of the nodes in the graph.
+ */
+export class AdjacencyList<T extends string | number> {
+    /**
+     * Internal state of the adjacency list, represented as a mapping from nodes to edges.
+     */
+    private state: Record<T, Edge<T>[]>;
+
+    /**
+     * Constructs an adjacency list.
+     * @param initialState - The initial state of the adjacency list (optional).
+     */
+    constructor(initialState?: Record<T, { node: T; weight?: number }[]>) {
+        // Use Object.create(null) to avoid prototype pollution issues
+        this.state = initialState || Object.create(null);
     }
 
     /**
-     * Adds a vertex to the graph.
-     * If the vertex already exists, it does nothing.
-     *
-     * @param {T} vertex - The vertex to be added.
+     * Adds a node to the adjacency list.
+     * If the node already exists, the graph remains unchanged.
+     * @param node - The node to add.
+     * @returns A new AdjacencyList instance with the node added.
      */
-    addVertex(vertex: T): void {
-        if (!this.adjList.has(vertex)) {
-            this.adjList.set(vertex, { neighbors: [], edgeData: new Map() });
+    addNode(node: T): AdjacencyList<T> {
+        if (this.state[node]) return this; // Node already exists
+        const newState = { ...this.state, [node]: [] as Edge<T>[] };
+        return new AdjacencyList(newState);
+    }
+
+    /**
+     * Adds an edge between two nodes.
+     * Automatically adds the target node if it does not exist.
+     * @param from - The source node.
+     * @param to - The target node.
+     * @param weight - The weight of the edge (optional).
+     * @param bidirectional - Whether the edge is bidirectional (default: false).
+     * @returns A new AdjacencyList instance with the edge added.
+     */
+    // eslint-disable-next-line max-params
+    addEdge(from: T, to: T, weight?: number, bidirectional = false): AdjacencyList<T> {
+        const newState = { ...this.state };
+
+        // Securely initialize the state
+        if (!newState[from]) newState[from] = [];
+        if (!newState[to]) newState[to] = [];
+
+        newState[from] = [...newState[from], { node: to, weight }];
+        if (bidirectional) {
+            newState[to] = [...newState[to], { node: from, weight }];
         }
+
+        return new AdjacencyList(newState);
     }
 
     /**
-     * Adds a directed edge from vertex1 to vertex2 with optional edge data.
-     * If either vertex does not exist, it will be added to the graph.
-     *
-     * @param {T} vertex1 - The starting vertex of the edge.
-     * @param {T} vertex2 - The ending vertex of the edge.
-     * @param {E} edgeData - Optional edge data (e.g., weight, label).
+     * Removes a node and all associated edges.
+     * @param node - The node to remove.
+     * @returns A new AdjacencyList instance with the node removed.
      */
-    addEdge(vertex1: T, vertex2: T, edgeData?: E): void {
-        this.addVertex(vertex1);
-        this.addVertex(vertex2);
-
-        // Add the edge to the neighbors list of vertex1
-        const vertex1Data = this.adjList.get(vertex1);
-        if (vertex1Data) {
-            vertex1Data.neighbors.push(vertex2);
-            if (edgeData !== undefined) {
-                vertex1Data.edgeData.set(vertex2, edgeData); // Store the edge data
-            }
+    removeNode(node: T): AdjacencyList<T> {
+        const newState = { ...this.state };
+        delete newState[node];
+        for (const key in newState) {
+            newState[key] = newState[key].filter((edge) => edge.node !== node);
         }
+        return new AdjacencyList(newState);
     }
 
     /**
-     * Removes a vertex and all its associated edges from the graph.
-     * If the vertex does not exist, it does nothing.
-     *
-     * @param {T} vertex - The vertex to be removed.
+     * Removes an edge between two nodes.
+     * @param from - The source node.
+     * @param to - The target node.
+     * @returns A new AdjacencyList instance with the edge removed.
      */
-    removeVertex(vertex: T): void {
-        if (this.adjList.has(vertex)) {
-            // Remove the vertex from the adjacency list
-            this.adjList.delete(vertex);
-
-            // Remove all edges pointing to this vertex
-            this.adjList.forEach((data) => {
-                const index = data.neighbors.indexOf(vertex);
-                if (index !== -1) {
-                    data.neighbors.splice(index, 1);
-                    data.edgeData.delete(vertex); // Remove any associated edge data
-                }
-            });
+    removeEdge(from: T, to: T): AdjacencyList<T> {
+        const newState = { ...this.state };
+        if (newState[from]) {
+            newState[from] = newState[from].filter((edge) => edge.node !== to);
         }
+        return new AdjacencyList(newState);
     }
 
     /**
-     * Removes the directed edge from vertex1 to vertex2.
-     * If no such edge exists, it does nothing.
-     *
-     * @param {T} vertex1 - The starting vertex of the edge.
-     * @param {T} vertex2 - The ending vertex of the edge.
+     * Gets all neighbors (edges) of a node.
+     * @param node - The node to query.
+     * @returns An array of edges connected to the node.
      */
-    removeEdge(vertex1: T, vertex2: T): void {
-        const vertex1Data = this.adjList.get(vertex1);
-        if (vertex1Data) {
-            const index = vertex1Data.neighbors.indexOf(vertex2);
-            if (index !== -1) {
-                vertex1Data.neighbors.splice(index, 1); // Remove the neighbor
-                vertex1Data.edgeData.delete(vertex2); // Remove the edge data
-            }
+    getNeighbors(node: T): { node: T; weight?: number }[] {
+        return this.state[node] || [];
+    }
+
+    /**
+     * Gets all neighbors of a node, including nodes pointing to it (reverse edges).
+     * @param node - The node to query.
+     * @returns An array of neighbors (connected nodes).
+     */
+    getBidirectionalNeighbors(node: T): T[] {
+        const forwardNeighbors = this.getNeighbors(node).map((edge) => edge.node);
+        const reverseNeighbors = this.getNodes().filter((neighbor) =>
+            this.getNeighbors(neighbor).some((edge) => edge.node === node),
+        );
+        return [...new Set([...forwardNeighbors, ...reverseNeighbors])];
+    }
+
+    /**
+     * Gets all nodes in the adjacency list.
+     * @returns An array of nodes in the graph.
+     */
+    getNodes(): T[] {
+        return Object.keys(this.state) as T[];
+    }
+
+    /**
+     * Transforms the edges of the graph using a mapping function.
+     * The mapping function receives the edges and the node they belong to.
+     * @param transform - The function to apply to the edges.
+     * @returns A new AdjacencyList instance with transformed edges.
+     */
+    map(transform: (edges: Edge<T>[], node: T) => Edge<T>[]): AdjacencyList<T> {
+        const newState: Record<T, Edge<T>[]> = {} as Record<T, Edge<T>[]>;
+        for (const node in this.state) {
+            newState[node] = transform(this.state[node], node as T);
         }
+        return new AdjacencyList(newState);
     }
 
     /**
-     * Returns the list of neighbors for the given vertex.
-     * If the vertex does not exist, it returns an empty array.
-     *
-     * @param {T} vertex - The vertex whose neighbors are to be returned.
-     * @returns {T[]} - The list of neighbors of the vertex.
+     * Serializes the adjacency list to a JSON string.
+     * @returns A JSON string representing the adjacency list.
      */
-    getNeighbors(vertex: T): T[] {
-        return this.adjList.get(vertex)?.neighbors || [];
+    toJSON(): string {
+        return JSON.stringify(this.state);
     }
 
     /**
-     * Returns the edge data (if any) associated with an edge from vertex1 to vertex2.
-     *
-     * @param {T} vertex1 - The starting vertex of the edge.
-     * @param {T} vertex2 - The ending vertex of the edge.
-     * @returns {E | undefined} - The edge data (e.g., weight) or undefined if no edge exists.
+     * Creates an AdjacencyList from a serialized JSON string.
+     * @param json - A JSON string representing the adjacency list.
+     * @returns A new AdjacencyList instance.
      */
-    getEdgeData(vertex1: T, vertex2: T): E | undefined {
-        return this.adjList.get(vertex1)?.edgeData.get(vertex2);
+    static fromJSON<U extends string | number>(json: string): AdjacencyList<U> {
+        return new AdjacencyList<U>(JSON.parse(json));
     }
 
     /**
-     * Returns all the vertices in the graph.
-     *
-     * @returns {T[]} - An array of all vertices in the graph.
+     * Clears all nodes and edges from the adjacency list.
+     * @returns A new, empty AdjacencyList instance.
      */
-    getVertices(): T[] {
-        return Array.from(this.adjList.keys());
-    }
-
-    /**
-     * Returns all edges in the graph as an array of [source, target] pairs.
-     *
-     * @returns {Array<[T, T]>} - An array of edges.
-     */
-    getEdges(): Array<[T, T]> {
-        const edges: Array<[T, T]> = [];
-        this.adjList.forEach((data, vertex) => {
-            data.neighbors.forEach((neighbor) => {
-                edges.push([vertex, neighbor]);
-            });
-        });
-        return edges;
-    }
-
-    /**
-     * Returns the total number of vertices in the graph.
-     *
-     * @returns {number} - The number of vertices in the graph.
-     */
-    getTotalEdgeWeight(): number {
-        const processedEdges = new Set<string>();
-        let totalWeight = 0;
-
-        this.adjList.forEach((data, source) => {
-            data.neighbors.forEach((neighbor) => {
-                const edgeKey =
-                    source < neighbor ? `${source}-${neighbor}` : `${neighbor}-${source}`;
-                if (!processedEdges.has(edgeKey)) {
-                    processedEdges.add(edgeKey);
-                    totalWeight += (this.getEdgeData(source, neighbor) as unknown as number) ?? 0;
-                }
-            });
-        });
-
-        return totalWeight;
-    }
-
-    /**
-     * Returns the degree of a vertex in the graph.
-     * @param vertex
-     */
-    getNodeDegree(vertex: T): number {
-        const data = this.adjList.get(vertex);
-        return data
-            ? Array.from(data.edgeData.values()).reduce((a, b) => a + (b as unknown as number), 0)
-            : 0;
-    }
-
-    /**
-     * Checks if an edge exists between two vertices.
-     *
-     * @param {T} vertex1 - The first vertex.
-     * @param {T} vertex2 - The second vertex.
-     * @returns {boolean} - True if the edge exists, false otherwise.
-     */
-    hasEdge(vertex1: T, vertex2: T): boolean {
-        const vertex1Data = this.adjList.get(vertex1);
-        return vertex1Data?.edgeData.has(vertex2) || false;
-    }
-
-    /**
-     * Prints the entire graph, showing each vertex and its associated neighbors and edge data.
-     */
-    printGraph(): void {
-        this.adjList.forEach((data, vertex) => {
-            const vertexStr = this.stringifyVertex(vertex); // Convert the vertex to a readable string
-            const neighborsStr = data.neighbors
-                .map((neighbor) => {
-                    const edgeInfo = data.edgeData.get(neighbor);
-                    return `${this.stringifyVertex(neighbor)} (Edge Data: ${edgeInfo ?? 'None'})`;
-                })
-                .join(', ');
-
-            console.log(`${vertexStr} → ${neighborsStr}`);
-        });
-    }
-
-    /**
-     * Helper method to convert custom vertex objects to a string representation
-     * @param vertex
-     * @private
-     */
-    private stringifyVertex(vertex: T): string {
-        if (typeof vertex === 'object' && vertex !== null) {
-            // If the vertex is an object, return a readable string (based on properties)
-            return JSON.stringify(vertex);
-        }
-        // If it's a primitive type (e.g., string, number), return it as is
-        return vertex.toString();
+    clear(): AdjacencyList<T> {
+        return new AdjacencyList();
     }
 }

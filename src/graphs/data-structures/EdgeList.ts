@@ -1,114 +1,130 @@
 /**
- * A class representing a graph using the edge list representation.
- *
- * The edge list is a collection of edges where each edge is represented as a pair (or tuple) of vertices,
- * optionally with some edge data (e.g., weight, label).
- * It is efficient for sparse graphs and is often used when you only need to store the edges without worrying about neighbors.
- *
- * When to Use Edge List:
- * - Sparse graphs: When you have relatively few edges compared to the number of vertices.
- * - Simple graph structure: When you just want to store edges without needing fast neighbor queries.
- *
- * When Not to Use Edge List:
- * - Dense graphs: When there are many edges, an adjacency matrix or list might be more efficient.
- * - Frequent neighbor queries: Edge lists are not efficient for quickly looking up all neighbors of a vertex.
- *
- * **Complexity:**
- * - **Space Complexity:** O(E), where E is the number of edges.
- * - **Time Complexity:**
- *   - `addEdge()`: O(1) – Adding an edge is a constant-time operation.
- *   - `removeEdge()`: O(E) – Removing an edge requires scanning the list of edges.
- *   - `getNeighbors()`: O(E) – Accessing the neighbors of a vertex requires scanning the entire edge list.
- *   - `printGraph()`: O(E) – Printing the entire graph requires traversing all edges.
+ * Represents an edge in the Edge List.
+ * @template T - The type of the node.
  */
-export class EdgeList<T, E> {
-    private edges: Array<{ vertex1: T; vertex2: T; edgeData?: E }>; // Array of edges, each with optional data
+type Edge<T> = {
+    from: T;
+    to: T;
+    weight?: number;
+};
 
-    constructor() {
-        this.edges = [];
+/**
+ * A functional-style Edge List for representing graphs.
+ * Provides immutable operations for graph construction and manipulation.
+ * @template T - The type of the nodes in the graph.
+ */
+export class EdgeList<T extends string | number> {
+    private edges: Edge<T>[];
+
+    /**
+     * Constructs an Edge List.
+     * @param edges - Initial list of edges (optional).
+     */
+    constructor(edges: Edge<T>[] = []) {
+        this.edges = edges;
     }
 
     /**
-     * Adds an edge between vertex1 and vertex2 with optional edge data (e.g., weight).
-     *
-     * @param {T} vertex1 - The starting vertex of the edge.
-     * @param {T} vertex2 - The ending vertex of the edge.
-     * @param {E} edgeData - Optional edge data (e.g., weight, label).
+     * Adds a node to the graph.
+     * Since Edge Lists don't explicitly store nodes, this is a no-op.
+     * @param _node - The node to add.
+     * @returns The same EdgeList instance.
      */
-    addEdge(vertex1: T, vertex2: T, edgeData?: E): void {
-        this.edges.push({ vertex1, vertex2, edgeData });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    addNode(_node: T): EdgeList<T> {
+        return this; // Nodes are implicit in Edge List
     }
 
     /**
-     * Removes an edge between vertex1 and vertex2.
-     * If no such edge exists, it does nothing.
-     *
-     * @param {T} vertex1 - The starting vertex of the edge.
-     * @param {T} vertex2 - The ending vertex of the edge.
+     * Adds an edge between two nodes.
+     * @param from - The source node.
+     * @param to - The target node.
+     * @param weight - The weight of the edge (optional).
+     * @param bidirectional - Whether the edge is bidirectional (default: false).
+     * @returns A new EdgeList instance with the edge added.
      */
-    removeEdge(vertex1: T, vertex2: T): void {
-        this.edges = this.edges.filter(
-            (edge) => !(edge.vertex1 === vertex1 && edge.vertex2 === vertex2),
-        );
-    }
-
-    /**
-     * Returns a list of neighbors for the given vertex.
-     * If the vertex does not exist, it returns an empty array.
-     *
-     * @param {T} vertex - The vertex whose neighbors are to be returned.
-     * @returns {T[]} - The list of neighbors of the vertex.
-     */
-    getNeighbors(vertex: T): T[] {
-        const neighbors: T[] = [];
-        this.edges.forEach((edge) => {
-            if (edge.vertex1 === vertex) {
-                neighbors.push(edge.vertex2);
-            }
-            if (edge.vertex2 === vertex) {
-                neighbors.push(edge.vertex1);
-            }
-        });
-        return neighbors;
-    }
-
-    /**
-     * Returns the edge data (if any) associated with an edge between vertex1 and vertex2.
-     *
-     * @param {T} vertex1 - The starting vertex of the edge.
-     * @param {T} vertex2 - The ending vertex of the edge.
-     * @returns {E | undefined} - The edge data (e.g., weight) or undefined if no edge exists.
-     */
-    getEdgeData(vertex1: T, vertex2: T): E | undefined {
-        const edge = this.edges.find(
-            (edge) =>
-                (edge.vertex1 === vertex1 && edge.vertex2 === vertex2) ||
-                (edge.vertex1 === vertex2 && edge.vertex2 === vertex1),
-        );
-        return edge?.edgeData;
-    }
-
-    /**
-     * Prints the entire graph, showing each edge and its associated data.
-     */
-    printGraph(): void {
-        this.edges.forEach((edge) => {
-            const edgeData = edge.edgeData ? ` (Edge Data: ${edge.edgeData})` : '';
-            console.log(
-                `${this.stringifyVertex(edge.vertex1)} → ${this.stringifyVertex(edge.vertex2)}${edgeData}`,
-            );
-        });
-    }
-
-    /**
-     * Helper method to convert custom vertex objects to a string representation
-     * @param vertex
-     * @private
-     */
-    private stringifyVertex(vertex: T): string {
-        if (typeof vertex === 'object' && vertex !== null) {
-            return JSON.stringify(vertex); // If the vertex is an object, return a readable string
+    // eslint-disable-next-line max-params
+    addEdge(from: T, to: T, weight?: number, bidirectional = false): EdgeList<T> {
+        const newEdges = [...this.edges, { from, to, weight }];
+        if (bidirectional) {
+            newEdges.push({ from: to, to: from, weight });
         }
-        return vertex.toString(); // Otherwise, return the string representation
+        return new EdgeList(newEdges);
+    }
+
+    /**
+     * Removes an edge between two nodes.
+     * @param from - The source node.
+     * @param to - The target node.
+     * @returns A new EdgeList instance with the edge removed.
+     */
+    removeEdge(from: T, to: T): EdgeList<T> {
+        const newEdges = this.edges.filter((edge) => !(edge.from === from && edge.to === to));
+        return new EdgeList(newEdges);
+    }
+
+    /**
+     * Removes all edges associated with a node.
+     * @param node - The node to remove.
+     * @returns A new EdgeList instance with the node removed.
+     */
+    removeNode(node: T): EdgeList<T> {
+        const newEdges = this.edges.filter((edge) => edge.from !== node && edge.to !== node);
+        return new EdgeList(newEdges);
+    }
+
+    /**
+     * Gets all neighbors of a node.
+     * @param node - The node to query.
+     * @returns An array of neighbors with weights.
+     */
+    getNeighbors(node: T): { node: T; weight?: number }[] {
+        return this.edges
+            .filter((edge) => edge.from === node) // Outgoing edges
+            .map((edge) => ({ node: edge.to, weight: edge.weight }));
+    }
+
+    /**
+     * Gets all neighbors of a node, including reverse edges.
+     * @param node - The node to query.
+     * @returns An array of neighbors with weights.
+     */
+    getBidirectionalNeighbors(node: T): { node: T; weight?: number }[] {
+        return this.edges
+            .filter((edge) => edge.from === node || edge.to === node)
+            .map((edge) => ({
+                node: edge.from === node ? edge.to : edge.from,
+                weight: edge.weight,
+            }));
+    }
+
+    /**
+     * Gets all nodes in the graph.
+     * @returns An array of unique nodes.
+     */
+    getNodes(): T[] {
+        const nodes = new Set<T>();
+        this.edges.forEach((edge) => {
+            nodes.add(edge.from);
+            nodes.add(edge.to);
+        });
+        return Array.from(nodes);
+    }
+
+    /**
+     * Serializes the edge list to a JSON string.
+     * @returns A JSON string representing the edge list.
+     */
+    toJSON(): string {
+        return JSON.stringify(this.edges);
+    }
+
+    /**
+     * Creates an EdgeList from a serialized JSON string.
+     * @param json - A JSON string representing the edge list.
+     * @returns A new EdgeList instance.
+     */
+    static fromJSON<U extends string | number>(json: string): EdgeList<U> {
+        return new EdgeList<U>(JSON.parse(json));
     }
 }

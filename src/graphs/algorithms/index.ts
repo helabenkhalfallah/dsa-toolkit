@@ -1,1 +1,1 @@
-export * from './community-detection/index.ts';
+export * from './graph-traversal-search/index.ts';

@@ -12,9 +12,6 @@
   "scripts": {
     "update-docs": "rimraf ./docs && typedoc",
     "build": "rimraf ./dist && tsc",
-    "bench-ds": "nodemon --exec node --loader ts-node/esm ./benchmark-ds.ts -- --dev",
-    "bench-algo": "nodemon --exec node --loader ts-node/esm ./benchmark-algo.ts -- --dev",
-    "bench-graph": "nodemon --exec node --loader ts-node/esm ./benchmark-graph.ts -- --dev",
     "lint": "eslint --config ./eslint.config.mjs --cache-location ./.eslintcache \"./**/*.ts\" --cache",
     "lint:fix": "eslint --config ./eslint.config.mjs --cache-location ./.eslintcache \"./**/*.ts\" --cache --fix",
     "format": "prettier --write ./src",
@@ -33,6 +30,7 @@
   },
   "devDependencies": {
     "@eslint/js": "=9.11.1",
+    "@fast-check/vitest": "=0.1.4",
     "@trivago/prettier-plugin-sort-imports": "=4.3.0",
     "@types/eslint__js": "=8.42.3",
     "@types/node": "=22.9.0",
@@ -42,6 +40,7 @@
     "eslint": "=9.0.0",
     "eslint-config-prettier": "=9.1.0",
     "eslint-plugin-prettier": "=5.2.1",
+    "fast-check": "=3.23.2",
     "graphology-types": "=0.24.8",
     "husky": "=9.1.6",
     "nodemon": "=2.0.19",

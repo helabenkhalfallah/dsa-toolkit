@@ -1,164 +1,176 @@
 /**
- * A class representing a graph using the adjacency matrix representation.
- *
- * The adjacency matrix is a 2D array where each cell (i, j) represents whether there is an edge between vertex i and vertex j.
- * It is efficient for dense graphs, where the number of edges is close to the number of vertices squared.
- *
- * When to Use Adjacency Matrix:
- * - Dense graphs: When you have many edges.
- * - Fixed graph structure: If you don’t need to add/remove vertices or edges frequently.
- * - Constant-time edge lookups: If you need to quickly check if there’s an edge between two vertices.
- *
- * When Not to Use Adjacency Matrix:
- * - Sparse graphs: When the number of edges is much smaller than the number of vertices, it may be inefficient.
- * - Dynamic graphs: If you frequently add or remove vertices/edges, the matrix size must be updated, which can be costly.
- *
- * **Complexity:**
- * - **Space Complexity:** O(V^2), where V is the number of vertices. The matrix requires space for every pair of vertices.
- * - **Time Complexity:**
- *   - `addVertex()`: O(V) – Adding a vertex requires resizing the matrix.
- *   - `addEdge()`: O(1) – Adding an edge is a constant-time operation.
- *   - `removeVertex()`: O(V^2) – Removing a vertex involves removing all related edges in the matrix.
- *   - `removeEdge()`: O(1) – Removing an edge is a constant-time operation.
- *   - `getNeighbors()`: O(V) – Accessing neighbors requires scanning the row for the vertex.
- *   - `printGraph()`: O(V^2) – Printing the entire graph requires printing the matrix.
+ * A functional-style Adjacency Matrix for representing graphs.
+ * Provides immutable operations for graph construction and manipulation.
+ * @template T - The type of the nodes in the graph.
  */
-export class AdjacencyMatrix<T, E> {
-    private adjMatrix: (E | undefined)[][]; // 2D matrix to store edge data
-    private vertices: T[]; // Array to store the vertices
-    private vertexIndex: Map<T, number>; // Map to associate each vertex with an index
+export class AdjacencyMatrix<T extends string | number> {
+    private matrix: number[][];
+    private nodes: T[];
 
-    constructor() {
-        this.adjMatrix = [];
-        this.vertices = [];
-        this.vertexIndex = new Map();
+    /**
+     * Constructs an adjacency matrix.
+     * @param nodes - Initial nodes in the graph (optional).
+     * @param matrix - Initial adjacency matrix (optional).
+     */
+    constructor(nodes: T[] = [], matrix: number[][] = []) {
+        this.nodes = nodes;
+        this.matrix = matrix;
     }
 
     /**
-     * Adds a vertex to the graph. If the vertex already exists, it does nothing.
-     * The vertex is associated with a row and column in the adjacency matrix.
+     * Finds the index of a node.
+     * @param node - The node to find.
+     * @returns The index of the node, or -1 if not found.
      */
-    addVertex(vertex: T): void {
-        if (!this.vertexIndex.has(vertex)) {
-            const index = this.vertices.length;
-            this.vertices.push(vertex);
-            this.vertexIndex.set(vertex, index);
-
-            // Resize the matrix to accommodate the new vertex
-            this.adjMatrix.forEach((row) => row.push(undefined)); // Add column for the new vertex
-
-            // Add a new row in the matrix for the new vertex, initialize with undefined (no edges)
-            const newRow = Array(this.vertices.length).fill(undefined);
-            this.adjMatrix.push(newRow);
-        }
+    private getNodeIndex(node: T): number {
+        return this.nodes.indexOf(node);
     }
 
     /**
-     * Adds a directed edge from vertex1 to vertex2 with optional edge data.
-     * If either vertex does not exist, it will be added to the graph.
+     * Adds a node to the graph.
+     * If the node already exists, the graph remains unchanged.
+     * @param node - The node to add.
+     * @returns A new AdjacencyMatrix instance with the node added.
      */
-    addEdge(vertex1: T, vertex2: T, edgeData?: E): void {
-        this.addVertex(vertex1);
-        this.addVertex(vertex2);
+    addNode(node: T): AdjacencyMatrix<T> {
+        if (this.nodes.includes(node)) return this; // Node already exists
 
-        const index1 = this.vertexIndex.get(vertex1)!;
-        const index2 = this.vertexIndex.get(vertex2)!;
+        const newNodes = [...this.nodes, node];
+        const size = newNodes.length;
 
-        // Set the edge data at the matrix position
-        this.adjMatrix[index1][index2] = edgeData;
+        // Expand the matrix
+        const newMatrix = this.matrix.map((row) => [...row, 0]);
+        newMatrix.push(Array(size).fill(0));
+
+        return new AdjacencyMatrix(newNodes, newMatrix);
     }
 
     /**
-     * Removes a vertex and all its associated edges from the graph.
-     * If the vertex does not exist, it does nothing.
+     * Adds an edge between two nodes.
+     * Automatically adds the nodes if they do not exist.
+     * @param from - The source node.
+     * @param to - The target node.
+     * @param weight - The weight of the edge (default: 1).
+     * @param bidirectional - Whether the edge is bidirectional (default: false).
+     * @returns A new AdjacencyMatrix instance with the edge added.
      */
-    removeVertex(vertex: T): void {
-        const index = this.vertexIndex.get(vertex);
-        if (index !== undefined) {
-            // Remove the vertex from the vertex list and map
-            this.vertices.splice(index, 1);
-            this.vertexIndex.delete(vertex);
+    // eslint-disable-next-line max-params
+    addEdge(from: T, to: T, weight = 1, bidirectional = false): AdjacencyMatrix<T> {
+        if (!from || !to) return this; // Ignore invalid or empty nodes
+        if (weight <= 0) return this; // Ignore invalid weights
 
-            // Remove the corresponding row and column from the adjacency matrix
-            this.adjMatrix.splice(index, 1); // Remove row
-            this.adjMatrix.forEach((row) => row.splice(index, 1)); // Remove column
+        const newNodes = [...this.nodes];
+        const matrix = this.matrix.map((row) => [...row]);
 
-            // Rebuild the vertex-index map and matrix after removal
-            this.vertices.forEach((v, idx) => this.vertexIndex.set(v, idx));
-        }
-    }
+        const ensureIndex = (node: T) => {
+            if (!newNodes.includes(node)) {
+                newNodes.push(node);
+                matrix.forEach((row) => row.push(0)); // Expand existing rows
+                matrix.push(new Array(newNodes.length).fill(0)); // Add a new row
+            }
+            return newNodes.indexOf(node);
+        };
 
-    /**
-     * Removes the directed edge from vertex1 to vertex2.
-     * If no such edge exists, it does nothing.
-     */
-    removeEdge(vertex1: T, vertex2: T): void {
-        const index1 = this.vertexIndex.get(vertex1)!;
-        const index2 = this.vertexIndex.get(vertex2)!;
-        this.adjMatrix[index1][index2] = undefined; // Remove the edge
-    }
+        const fromIndex = ensureIndex(from);
+        const toIndex = ensureIndex(to);
 
-    /**
-     * Returns the list of neighbors for the given vertex.
-     * If the vertex does not exist, it returns an empty array.
-     */
-    getNeighbors(vertex: T): T[] {
-        const index = this.vertexIndex.get(vertex);
-        if (index !== undefined) {
-            return this.adjMatrix[index]
-                .map((edge, idx) => (edge !== undefined ? this.vertices[idx] : null))
-                .filter((vertex) => vertex !== null) as T[];
-        }
-        return [];
-    }
-
-    /**
-     * Returns the edge data (if any) associated with an edge from vertex1 to vertex2.
-     */
-    getEdgeData(vertex1: T, vertex2: T): E | undefined {
-        const index1 = this.vertexIndex.get(vertex1);
-        const index2 = this.vertexIndex.get(vertex2);
-
-        // Check that both vertices exist before accessing the matrix
-        if (index1 === undefined || index2 === undefined) {
-            return undefined; // Return undefined if either vertex is missing
+        matrix[fromIndex][toIndex] = weight;
+        if (bidirectional) {
+            matrix[toIndex][fromIndex] = weight;
         }
 
-        return this.adjMatrix[index1][index2];
+        return new AdjacencyMatrix(newNodes, matrix);
     }
 
     /**
-     * Returns all the vertices in the graph.
-     *
-     * @returns {T[]} - An array of all vertices in the graph.
+     * Removes a node and all its associated edges.
+     * @param node - The node to remove.
+     * @returns A new AdjacencyMatrix instance with the node removed.
      */
-    getVertices(): T[] {
-        return [...this.vertices];
+    removeNode(node: T): AdjacencyMatrix<T> {
+        const index = this.getNodeIndex(node);
+        if (index === -1) return this; // Node doesn't exist
+
+        const newNodes = this.nodes.filter((_, i) => i !== index);
+        const newMatrix = this.matrix
+            .filter((_, rowIndex) => rowIndex !== index)
+            .map((row) => row.filter((_, colIndex) => colIndex !== index));
+
+        return new AdjacencyMatrix(newNodes, newMatrix);
     }
 
     /**
-     * Prints the entire graph, showing each vertex and its associated neighbors and edge data.
+     * Removes an edge between two nodes.
+     * @param from - The source node.
+     * @param to - The target node.
+     * @returns A new AdjacencyMatrix instance with the edge removed.
      */
-    printGraph(): void {
-        this.vertices.forEach((vertex) => {
-            const neighbors = this.getNeighbors(vertex);
-            const neighborsStr = neighbors
-                .map((neighbor) => {
-                    const edgeData = this.getEdgeData(vertex, neighbor);
-                    return `${this.stringifyVertex(neighbor)} (Edge Data: ${edgeData ?? 'None'})`;
-                })
-                .join(', ');
-            console.log(`${this.stringifyVertex(vertex)} → ${neighborsStr}`);
-        });
+    removeEdge(from: T, to: T): AdjacencyMatrix<T> {
+        const fromIndex = this.getNodeIndex(from);
+        const toIndex = this.getNodeIndex(to);
+        if (fromIndex === -1 || toIndex === -1) return this; // Nodes don't exist
+
+        const newMatrix = this.matrix.map((row) => [...row]);
+        newMatrix[fromIndex][toIndex] = 0;
+
+        return new AdjacencyMatrix(this.nodes, newMatrix);
     }
 
     /**
-     * Helper method to convert custom vertex objects to a string representation.
+     * Gets all neighbors of a node.
+     * @param node - The node to query.
+     * @returns An array of neighbors with weights.
      */
-    private stringifyVertex(vertex: T): string {
-        if (typeof vertex === 'object' && vertex !== null) {
-            return JSON.stringify(vertex);
-        }
-        return vertex.toString();
+    getNeighbors(node: T): { node: T; weight: number }[] {
+        const index = this.getNodeIndex(node);
+        if (index === -1) return []; // Node doesn't exist
+
+        return this.matrix[index]
+            .map((weight, colIndex) => ({ node: this.nodes[colIndex], weight }))
+            .filter((edge) => edge.weight > 0);
+    }
+
+    /**
+     * Gets all neighbors of a node, including reverse edges (bidirectional).
+     * @param node - The node to query.
+     * @returns An array of neighbors with weights.
+     */
+    getBidirectionalNeighbors(node: T): { node: T; weight: number }[] {
+        const index = this.getNodeIndex(node);
+        if (index === -1) return []; // Node doesn't exist
+
+        const forwardNeighbors = this.getNeighbors(node);
+        const reverseNeighbors = this.nodes
+            .map((n, rowIndex) => ({ node: n, weight: this.matrix[rowIndex][index] }))
+            .filter((edge) => edge.weight > 0);
+
+        const neighbors = [...forwardNeighbors, ...reverseNeighbors];
+        return Array.from(new Map(neighbors.map((n) => [n.node, n])).values());
+    }
+
+    /**
+     * Gets all nodes in the graph.
+     * @returns An array of nodes.
+     */
+    getNodes(): T[] {
+        return [...this.nodes];
+    }
+
+    /**
+     * Serializes the adjacency matrix to a JSON string.
+     * @returns A JSON string representing the adjacency matrix.
+     */
+    toJSON(): string {
+        return JSON.stringify({ nodes: this.nodes, matrix: this.matrix });
+    }
+
+    /**
+     * Creates an AdjacencyMatrix from a serialized JSON string.
+     * @param json - A JSON string representing the adjacency matrix.
+     * @returns A new AdjacencyMatrix instance.
+     */
+    static fromJSON<U extends string | number>(json: string): AdjacencyMatrix<U> {
+        const { nodes, matrix } = JSON.parse(json);
+        return new AdjacencyMatrix<U>(nodes, matrix);
     }
 }

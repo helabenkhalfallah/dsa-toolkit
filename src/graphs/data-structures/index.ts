@@ -1,3 +1,3 @@
-export { AdjacencyList } from './AdjacencyList.ts';
-export { AdjacencyMatrix } from './AdjacencyMatrix.ts';
-export { EdgeList } from './EdgeList.ts';
+export * from './AdjacencyList.ts';
+export * from './AdjacencyMatrix.ts';
+export * from './EdgeList.ts';
